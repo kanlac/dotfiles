@@ -42,6 +42,7 @@ yadm bootstrap
 
 这个脚本会自动安装：
 - Homebrew（macOS）
+- Neovim 和 im-select（输入法切换工具）
 - oh-my-zsh
 - zsh-autosuggestions 插件
 - zsh-syntax-highlighting 插件
@@ -83,6 +84,9 @@ source ~/.zshrc
 ~
 ├── .zshrc                          # Zsh 主配置文件
 ├── .config/
+│   ├── nvim/
+│   │   ├── init.lua                # Neovim 配置
+│   │   └── lazy-lock.json          # lazy.nvim 插件锁定文件
 │   ├── yadm/
 │   │   ├── bootstrap               # 自动安装脚本
 │   │   └── ignore                  # yadm gitignore 规则
@@ -153,6 +157,30 @@ yadm list -a
 ### 自定义配置
 
 所有自定义的 zsh 配置文件都在 `~/.config/zsh-custom/` 目录下，会自动链接到 oh-my-zsh。
+
+### Neovim
+
+**配置文件**：`~/.config/nvim/init.lua`
+
+**特性**：
+- 使用 [lazy.nvim](https://github.com/folke/lazy.nvim) 管理插件
+- 浅色主题（gruvbox-light）
+- 自动输入法切换（需要 im-select）
+- 离开焦点自动保存
+- 系统剪贴板集成
+
+**首次使用**：
+```bash
+# 打开 Neovim，lazy.nvim 会自动安装插件
+nvim
+
+# 手动同步插件（如果需要）
+:Lazy sync
+```
+
+**包含的插件**：
+- vim-surround - 快速环绕操作
+- gruvbox.nvim - 主题
 
 ## 🔒 安全说明
 
