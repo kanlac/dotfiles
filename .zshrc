@@ -1,5 +1,8 @@
-export COMPUTER_ENV="$HOME/computer-env"
-source $COMPUTER_ENV/.env
+# Load environment variables from ~/.env if it exists
+# NOTE: ~/.env is gitignored and should contain sensitive tokens/keys
+if [ -f "$HOME/.env" ]; then
+    source "$HOME/.env"
+fi
 
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH

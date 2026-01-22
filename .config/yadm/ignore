@@ -1,0 +1,37 @@
+# yadm gitignore - 永远不要追踪这些文件
+
+# 敏感信息
+.env
+*.env
+*_env
+.env.*
+*.pem
+*.key
+id_rsa
+id_ed25519
+*.ppk
+
+# API tokens and secrets
+*token*
+*secret*
+*password*
+.aws/credentials
+.ssh/id_*
+.ssh/*.pem
+
+# 其他不想追踪的文件
+.DS_Store
+*.log
+.Trash/
+node_modules/
+
+# 大目录（避免意外添加）
+Applications/
+Desktop/
+Documents/
+Downloads/
+Library/
+Movies/
+Music/
+Pictures/
+Public/
