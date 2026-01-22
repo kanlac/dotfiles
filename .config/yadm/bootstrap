@@ -23,6 +23,19 @@ if [[ "$OS" == "Darwin" ]]; then
         echo "Installing zoxide..."
         brew install zoxide
     fi
+
+    # Install Neovim if not already installed
+    if ! command -v nvim &> /dev/null; then
+        echo "Installing Neovim..."
+        brew install neovim
+    fi
+
+    # Install im-select for input method switching (macOS only)
+    if ! command -v im-select &> /dev/null; then
+        echo "Installing im-select..."
+        brew tap daipeihust/tap
+        brew install im-select
+    fi
 fi
 
 # Install oh-my-zsh if not already installed
@@ -71,3 +84,7 @@ if [ -d "$HOME/.config/zsh-custom" ]; then
 fi
 
 echo "Bootstrap complete! Restart your shell to apply changes."
+echo ""
+echo "📝 Don't forget to:"
+echo "  1. Create ~/.env file with your sensitive environment variables"
+echo "  2. Open Neovim to let lazy.nvim install plugins: nvim"
