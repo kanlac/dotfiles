@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# yadm Bootstrap Script
+# This script automatically installs oh-my-zsh plugins and tools when setting up on a new machine
+
+echo "Running yadm bootstrap script..."
+
+# Detect OS
+OS="$(uname -s)"
+
+# Install Homebrew packages
+if [[ "$OS" == "Darwin" ]]; then
+    echo "Installing Homebrew packages..."
+
+    # Check if Homebrew is installed
+    if ! command -v brew &> /dev/null; then
+        echo "Homebrew not found. Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+
+    # Install zoxide if not already installed
+    if ! command -v zoxide &> /dev/null; then
+        echo "Installing zoxide..."
+        brew install zoxide
+    fi
+fi
+
+# Install oh-my-zsh if not already installed
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    echo "Installing oh-my-zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+fi
+
+# Install zsh-autosuggestions plugin
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+    echo "Installing zsh-autosuggestions..."
+    git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+else
+    echo "zsh-autosuggestions already installed"
+fi
+
+# Install zsh-syntax-highlighting plugin
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+    echo "Installing zsh-syntax-highlighting..."
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+else
+    echo "zsh-syntax-highlighting already installed"
+fi
+
+echo "Bootstrap complete! Restart your shell to apply changes."
