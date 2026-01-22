@@ -48,4 +48,26 @@ else
     echo "zsh-syntax-highlighting already installed"
 fi
 
+# Link custom zsh configs from ~/.config/zsh-custom/ to oh-my-zsh custom directory
+if [ -d "$HOME/.config/zsh-custom" ]; then
+    echo "Linking custom zsh configs..."
+
+    # Link .zsh files
+    for file in "$HOME/.config/zsh-custom"/*.zsh; do
+        if [ -f "$file" ]; then
+            filename=$(basename "$file")
+            if [ ! -e "$ZSH_CUSTOM/$filename" ]; then
+                ln -s "$file" "$ZSH_CUSTOM/$filename"
+                echo "  Linked $filename"
+            fi
+        fi
+    done
+
+    # Link themes directory
+    if [ -d "$HOME/.config/zsh-custom/themes" ] && [ ! -e "$ZSH_CUSTOM/themes" ]; then
+        ln -s "$HOME/.config/zsh-custom/themes" "$ZSH_CUSTOM/themes"
+        echo "  Linked themes directory"
+    fi
+fi
+
 echo "Bootstrap complete! Restart your shell to apply changes."
