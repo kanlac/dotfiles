@@ -1,0 +1,1 @@
+/Users/kan/computer-env/.zshrc
