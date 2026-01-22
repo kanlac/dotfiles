@@ -1,0 +1,134 @@
+################################################################################
+# Ghostty config template
+# Location (macOS/Linux): ~/.config/ghostty/config
+#
+# Useful CLI:
+#   ghostty +list-themes
+#   ghostty +list-fonts
+################################################################################
+
+
+################################################################################
+# THEME / COLORS
+################################################################################
+
+# Theme name. You can list all themes with: ghostty +list-themes
+# Examples from your machine:
+#   "Gruvbox Dark Hard (resources)"
+#   "Gruvbox Light Hard (resources)"
+#
+# theme = "Gruvbox Dark Hard (resources)"
+
+# Follow system appearance (dark/light). Format: dark:<theme>,light:<theme>
+theme = dark:"Gruvbox Dark",light:"Gruvbox Light"
+
+
+# Optional: override background/foreground directly (hex or named X11).
+# background = "#1d2021"
+# foreground = "#ebdbb2"
+# (These options exist in the reference and are useful for quick experiments.) :contentReference[oaicite:3]{index=3}
+
+
+################################################################################
+# BACKGROUND OPACITY / BLUR
+################################################################################
+# background-opacity: 1 = opaque, 0 = fully transparent (clamped to [0,1]).
+# On macOS: changing background-opacity requires restarting Ghostty completely. :contentReference[oaicite:4]{index=4}
+background-opacity = 0.8
+
+# Apply opacity to cells with explicit background colors too.
+# Useful if you use apps like Neovim/Tmux that paint background cells. :contentReference[oaicite:5]{index=5}
+background-opacity-cells = true
+
+# Blur background when background-opacity < 1.
+# Valid: integer intensity, true (=20), false (=0). :contentReference[oaicite:6]{index=6}
+background-blur = 15
+
+# Dim unfocused splits (1 disables). :contentReference[oaicite:7]{index=7}
+unfocused-split-opacity = 0.90
+
+
+################################################################################
+# FONTS
+################################################################################
+# font-family can be repeated multiple times as fallbacks. :contentReference[oaicite:8]{index=8}
+# List valid values:
+#   ghostty +list-fonts
+#
+# Recommended pattern:
+#   1) main mono font
+#   2) nerd font (icons) or CJK fallback (if you need)
+#
+# Reset list then set (handy when you tweak often):
+font-family = ""                                    # reset list :contentReference[oaicite:9]{index=9}
+font-family = "Monaco"
+# font-family = "Sarasa Mono SC"                    # example CJK fallback
+# font-family = "Symbols Nerd Font Mono"            # example symbols fallback
+
+# Font size in points; can be non-integer. :contentReference[oaicite:10]{index=10}
+font-size = 18
+
+# If true, new windows inherit previous window font size.
+# If you want config to always win, set false. :contentReference[oaicite:11]{index=11}
+window-inherit-font-size = false
+
+# Optional: set bold/italic families explicitly (usually not needed).
+# font-family-bold = "JetBrainsMono Nerd Font"
+# font-family-italic = "JetBrainsMono Nerd Font"
+# font-family-bold-italic = "JetBrainsMono Nerd Font"
+# (If not set, Ghostty searches variants in font-family automatically.) :contentReference[oaicite:12]{index=12}
+
+
+################################################################################
+# WINDOW / LAYOUT
+################################################################################
+# Padding around terminal content.
+# window-padding-x = 8
+# window-padding-y = 8
+# window-padding-balance = true
+
+# Initial window size (in cells). Handy for consistent screenshots/demos.
+# window-width = 120
+# window-height = 34
+
+macos-titlebar-style = tabs
+keybind = cmd+right=next_tab
+keybind = cmd+left=previous_tab
+
+################################################################################
+# SHELL / COMMAND
+################################################################################
+# Default command (shell). If not set, Ghostty picks a default based on system. :contentReference[oaicite:13]{index=13}
+# command = "/bin/zsh"
+
+
+################################################################################
+# KEYBINDINGS
+################################################################################
+# Keybind syntax is "keybind = <trigger>=<action>".
+# You asked: Cmd+J -> Esc
+# Esc is \x1b, we send it as text.
+keybind = cmd+j=text:\x1b
+
+# Optional: quick font size adjustments (instant, per-window feel)
+# (Actions listed in keybind docs; keep these if you like zooming.) 
+# keybind = cmd+=increase_font_size:1
+# keybind = cmd+-=decrease_font_size:1
+# keybind = cmd+0=reset_font_size
+
+# Optional: bind reload_config to something memorable.
+# Useful for fast iteration while testing options.
+# keybind = cmd+shift+r=reload_config
+
+
+################################################################################
+# QUALITY OF LIFE TOGGLES (optional experiments)
+################################################################################
+# selection-clear-on-typing defaults true. Turning it off can be nice for copy workflows. :contentReference[oaicite:14]{index=14}
+# selection-clear-on-typing = false
+
+# mouse-scroll-multiplier controls scroll speed. :contentReference[oaicite:15]{index=15}
+# mouse-scroll-multiplier = 3
+
+
+macos-option-as-alt = true

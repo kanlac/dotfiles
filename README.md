@@ -104,8 +104,9 @@ source ~/.zshrc
 │       ├── oc.zsh                  # 其他自定义配置
 │       └── themes/                 # 自定义主题
 ├── Library/
-│   └── Preferences/
-│       └── com.googlecode.iterm2.plist  # iTerm2 配置
+│   └── Application Support/
+│       └── com.mitchellh.ghostty/
+│           └── config                   # Ghostty 终端配置
 └── .env                            # ⚠️ 本地环境变量（不会同步）
 ```
 
@@ -194,23 +195,24 @@ nvim
 - vim-surround - 快速环绕操作
 - gruvbox.nvim - 主题
 
-### iTerm2
+### Ghostty
 
-**配置文件**：`~/.config/iterm2/`
+**配置文件**：`~/Library/Application Support/com.mitchellh.ghostty/config`
 
 **特性**：
-- Gruvbox Light 颜色主题
-- 自定义配置文件
+- 自动跟随系统主题（Gruvbox Dark/Light）
+- 半透明背景 + 模糊效果
+- Monaco 字体
+- Cmd+J 发送 Esc（方便 Vim 使用）
+- Cmd+Left/Right 切换标签页
 
-**导入配置**：
+**常用命令**：
 ```bash
-# iTerm2 > Preferences > General > Preferences
-# 勾选 "Load preferences from a custom folder or URL"
-# 选择: ~/.config/iterm2/
+# 列出可用主题
+ghostty +list-themes
 
-# 或者手动导入配置文件：
-# iTerm2 > Preferences > Profiles > Other Actions > Import JSON Profiles
-# 选择 ~/.config/iterm2/profile-kan.json
+# 列出可用字体
+ghostty +list-fonts
 ```
 
 ### Coding Agents (Claude Code / OpenCode)

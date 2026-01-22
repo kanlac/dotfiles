@@ -126,3 +126,34 @@ if vim.fn.executable("im-select") == 1 then
   })
 end
 
+
+
+
+-- 让 nvim 背景透明（配合终端透明）
+vim.opt.termguicolors = true
+
+local function transparent()
+  local groups = {
+    "Normal",
+    "NormalNC",
+    "NormalFloat",
+    "FloatBorder",
+    "SignColumn",
+    "FoldColumn",
+    "EndOfBuffer",
+    "MsgArea",
+  }
+  for _, g in ipairs(groups) do
+    vim.api.nvim_set_hl(0, g, { bg = "NONE" })
+  end
+end
+
+-- 如果你是启动时就设定 colorscheme：
+-- vim.cmd.colorscheme("gruvbox")
+transparent()
+
+-- 如果你会切换 colorscheme，建议再加个自动重应用：
+vim.api.nvim_create_autocmd("ColorScheme", {
+  callback = transparent,
+})
+
