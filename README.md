@@ -84,6 +84,10 @@ source ~/.zshrc
 ~
 ├── .zshrc                          # Zsh 主配置文件
 ├── .config/
+│   ├── iterm2/
+│   │   ├── com.googlecode.iterm2.plist  # iTerm2 主配置
+│   │   ├── gruvbox-light.itermcolors    # 颜色主题
+│   │   └── profile-kan.json             # 个人配置
 │   ├── nvim/
 │   │   ├── init.lua                # Neovim 配置
 │   │   └── lazy-lock.json          # lazy.nvim 插件锁定文件
@@ -181,6 +185,25 @@ nvim
 **包含的插件**：
 - vim-surround - 快速环绕操作
 - gruvbox.nvim - 主题
+
+### iTerm2
+
+**配置文件**：`~/.config/iterm2/`
+
+**特性**：
+- Gruvbox Light 颜色主题
+- 自定义配置文件
+
+**导入配置**：
+```bash
+# iTerm2 > Preferences > General > Preferences
+# 勾选 "Load preferences from a custom folder or URL"
+# 选择: ~/.config/iterm2/
+
+# 或者手动导入配置文件：
+# iTerm2 > Preferences > Profiles > Other Actions > Import JSON Profiles
+# 选择 ~/.config/iterm2/profile-kan.json
+```
 
 ## 🔒 安全说明
 
