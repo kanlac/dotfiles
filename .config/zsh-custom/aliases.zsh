@@ -5,20 +5,20 @@ alias cca='ANTHROPIC_BASE_URL=http://127.0.0.1:8045 ANTHROPIC_API_KEY=sk-antigra
 # `oc` to open opencode in new tab with smaller font setting
 oc() {
   # 缩小字体次数：默认 3 次（你可改 2/4）
-  local steps=3
+  local numSteps=3
 
   # 构造命令：用 "$@" 保留参数结构
   local cmd="opencode"
   if [[ $# -gt 0 ]]; then
     cmd+=" "
-    # 这里简单拼接；若你有带引号/空格的复杂参数，下面我再给“强健版”
+    # 这里简单拼接；若你有带引号/空格的复杂参数，下面我再给"强健版"
     cmd+="$*"
   fi
 
   /usr/bin/osascript <<APPLESCRIPT
 on run
   set theCmd to "${cmd}"
-  set steps to ${steps}
+  set numSteps to ${numSteps}
 
   tell application "Ghostty" to activate
   tell application "System Events"
@@ -26,8 +26,8 @@ on run
     keystroke "t" using {command down}
     delay 0.10
 
-    -- 缩小字体 steps 次（⌘-）
-    repeat steps times
+    -- 缩小字体 numSteps 次（⌘-）
+    repeat numSteps times
       keystroke "-" using {command down}
       delay 0.03
     end repeat
