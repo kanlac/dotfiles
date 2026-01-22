@@ -36,6 +36,12 @@ if [[ "$OS" == "Darwin" ]]; then
         brew tap daipeihust/tap
         brew install im-select
     fi
+
+    # Install jq for JSON processing
+    if ! command -v jq &> /dev/null; then
+        echo "Installing jq..."
+        brew install jq
+    fi
 fi
 
 # Install oh-my-zsh if not already installed
@@ -83,8 +89,44 @@ if [ -d "$HOME/.config/zsh-custom" ]; then
     fi
 fi
 
+# ===== Coding Agents Configuration =====
+CONFIG_SOURCE="$HOME/.config/yadm/coding-agents.json"
+
+if [ -f "$CONFIG_SOURCE" ] && command -v jq &> /dev/null; then
+    echo "Applying coding agents configuration..."
+
+    # ----- Claude: Merge MCP servers -----
+    CLAUDE_JSON="$HOME/.claude.json"
+    if [ -f "$CLAUDE_JSON" ]; then
+        jq --slurpfile src "$CONFIG_SOURCE" \
+          '.mcpServers = (.mcpServers // {}) * $src[0].claude.mcpServers' \
+          "$CLAUDE_JSON" > /tmp/claude.json.tmp && mv /tmp/claude.json.tmp "$CLAUDE_JSON"
+    else
+        jq '{mcpServers: .claude.mcpServers}' "$CONFIG_SOURCE" > "$CLAUDE_JSON"
+    fi
+    echo "  Claude MCP servers merged"
+
+    # ----- OpenCode: Merge MCP servers -----
+    OPENCODE_JSON="$HOME/.config/opencode/opencode.json"
+    if [ -f "$OPENCODE_JSON" ]; then
+        jq --slurpfile src "$CONFIG_SOURCE" \
+          '.mcp = (.mcp // {}) * $src[0].opencode.mcp' \
+          "$OPENCODE_JSON" > /tmp/opencode.json.tmp && mv /tmp/opencode.json.tmp "$OPENCODE_JSON"
+        echo "  OpenCode MCP servers merged"
+    fi
+
+    # ----- Claude: Install plugins -----
+    if command -v claude &> /dev/null; then
+        echo "Installing Claude plugins..."
+        jq -r '.claude.plugins[]' "$CONFIG_SOURCE" | while read plugin; do
+            claude plugins install "$plugin" 2>/dev/null || true
+        done
+    fi
+fi
+
+echo ""
 echo "Bootstrap complete! Restart your shell to apply changes."
 echo ""
-echo "📝 Don't forget to:"
+echo "Don't forget to:"
 echo "  1. Create ~/.env file with your sensitive environment variables"
 echo "  2. Open Neovim to let lazy.nvim install plugins: nvim"

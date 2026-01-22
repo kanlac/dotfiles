@@ -1,0 +1,35 @@
+{
+  "claude": {
+    "mcpServers": {
+      "playwright": {
+        "command": "npx",
+        "args": ["@playwright/mcp@latest"],
+        "type": "stdio"
+      },
+      "chrome-devtools": {
+        "command": "npx",
+        "args": ["chrome-devtools-mcp@latest"],
+        "type": "stdio"
+      }
+    },
+    "plugins": [
+      "context7@claude-plugins-official",
+      "plugin-dev@claude-plugins-official",
+      "gopls-lsp@claude-plugins-official",
+      "document-skills@anthropic-agent-skills",
+      "example-skills@anthropic-agent-skills"
+    ]
+  },
+  "opencode": {
+    "mcp": {
+      "playwright": {
+        "type": "local",
+        "command": ["npx", "@playwright/mcp@latest"]
+      },
+      "chrome-devtools": {
+        "type": "local",
+        "command": ["npx", "chrome-devtools-mcp@latest"]
+      }
+    }
+  }
+}

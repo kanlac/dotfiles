@@ -43,11 +43,13 @@ yadm bootstrap
 这个脚本会自动安装：
 - Homebrew（macOS）
 - Neovim 和 im-select（输入法切换工具）
+- jq（JSON 处理工具）
 - oh-my-zsh
 - zsh-autosuggestions 插件
 - zsh-syntax-highlighting 插件
 - zoxide（智能目录跳转）
 - 链接自定义 zsh 配置
+- 配置 Coding Agents（Claude Code、OpenCode 的 MCP servers 和插件）
 
 ### 4. 创建环境变量文件
 
@@ -83,6 +85,8 @@ source ~/.zshrc
 ```
 ~
 ├── .zshrc                          # Zsh 主配置文件
+├── .claude/
+│   └── settings.json               # Claude Code hooks 和 plugins 配置
 ├── .config/
 │   ├── iterm2/
 │   │   ├── com.googlecode.iterm2.plist  # iTerm2 主配置
@@ -92,8 +96,12 @@ source ~/.zshrc
 │   │   ├── init.lua                # Neovim 配置
 │   │   └── lazy-lock.json          # lazy.nvim 插件锁定文件
 │   ├── yadm/
+│   │   ├── README.md               # 本文件
 │   │   ├── bootstrap               # 自动安装脚本
-│   │   └── ignore                  # yadm gitignore 规则
+│   │   ├── coding-agents.json      # Coding Agents 统一配置源
+│   │   ├── ignore                  # yadm gitignore 规则
+│   │   └── docs/
+│   │       └── coding-agents-scheme.md  # Coding Agents 方案说明
 │   └── zsh-custom/
 │       ├── aliases.zsh             # 自定义别名
 │       ├── oc.zsh                  # 其他自定义配置
@@ -203,6 +211,26 @@ nvim
 # 或者手动导入配置文件：
 # iTerm2 > Preferences > Profiles > Other Actions > Import JSON Profiles
 # 选择 ~/.config/iterm2/profile-kan.json
+```
+
+### Coding Agents (Claude Code / OpenCode)
+
+**配置文件**：`~/.config/yadm/coding-agents.json`
+
+统一管理 Claude Code 和 OpenCode 的 MCP servers 及 Claude 插件。
+
+**工作原理**：
+- `yadm bootstrap` 读取 `coding-agents.json`
+- 合并 MCP servers 到 `~/.claude.json` 和 `~/.config/opencode/opencode.json`
+- 自动安装 Claude plugins
+
+**详细文档**：见 `~/.config/yadm/docs/coding-agents-scheme.md`
+
+**手动添加本地 MCP server**（如带 auth 的 playwright）：
+```bash
+# 直接编辑目标配置文件，不会被 bootstrap 覆盖
+# Claude: ~/.claude.json
+# OpenCode: ~/.config/opencode/opencode.json
 ```
 
 ## 🔒 安全说明
