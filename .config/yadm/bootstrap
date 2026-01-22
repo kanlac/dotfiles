@@ -42,6 +42,12 @@ if [[ "$OS" == "Darwin" ]]; then
         echo "Installing jq..."
         brew install jq
     fi
+
+    # Install Ghostty terminal
+    if ! command -v ghostty &> /dev/null; then
+        echo "Installing Ghostty..."
+        brew install --cask ghostty
+    fi
 fi
 
 # Install oh-my-zsh if not already installed
@@ -67,27 +73,6 @@ else
     echo "zsh-syntax-highlighting already installed"
 fi
 
-# Link custom zsh configs from ~/.config/zsh-custom/ to oh-my-zsh custom directory
-if [ -d "$HOME/.config/zsh-custom" ]; then
-    echo "Linking custom zsh configs..."
-
-    # Link .zsh files
-    for file in "$HOME/.config/zsh-custom"/*.zsh; do
-        if [ -f "$file" ]; then
-            filename=$(basename "$file")
-            if [ ! -e "$ZSH_CUSTOM/$filename" ]; then
-                ln -s "$file" "$ZSH_CUSTOM/$filename"
-                echo "  Linked $filename"
-            fi
-        fi
-    done
-
-    # Link themes directory
-    if [ -d "$HOME/.config/zsh-custom/themes" ] && [ ! -e "$ZSH_CUSTOM/themes" ]; then
-        ln -s "$HOME/.config/zsh-custom/themes" "$ZSH_CUSTOM/themes"
-        echo "  Linked themes directory"
-    fi
-fi
 
 # ===== Coding Agents Configuration =====
 CONFIG_SOURCE="$HOME/.config/agents.json"

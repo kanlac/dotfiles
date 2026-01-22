@@ -100,9 +100,7 @@ source ~/.zshrc
 │   │   ├── init.lua                # Neovim 配置
 │   │   └── lazy-lock.json          # lazy.nvim 插件锁定文件
 │   └── zsh-custom/
-│       ├── aliases.zsh             # 自定义别名
-│       ├── oc.zsh                  # 其他自定义配置
-│       └── themes/                 # 自定义主题
+│       └── aliases.zsh             # 自定义别名 (ZSH_CUSTOM 目录)
 ├── Library/
 │   └── Application Support/
 │       └── com.mitchellh.ghostty/
