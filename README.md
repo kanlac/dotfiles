@@ -96,10 +96,6 @@ source ~/.zshrc
 │   │   ├── bootstrap               # 自动安装脚本
 │   │   └── ignore                  # yadm gitignore 规则
 │   ├── agents.json                 # Coding Agents 统一配置源
-│   ├── iterm2/
-│   │   ├── com.googlecode.iterm2.plist  # iTerm2 主配置
-│   │   ├── gruvbox-light.itermcolors    # 颜色主题
-│   │   └── profile-kan.json             # 个人配置
 │   ├── nvim/
 │   │   ├── init.lua                # Neovim 配置
 │   │   └── lazy-lock.json          # lazy.nvim 插件锁定文件
@@ -107,6 +103,9 @@ source ~/.zshrc
 │       ├── aliases.zsh             # 自定义别名
 │       ├── oc.zsh                  # 其他自定义配置
 │       └── themes/                 # 自定义主题
+├── Library/
+│   └── Preferences/
+│       └── com.googlecode.iterm2.plist  # iTerm2 配置
 └── .env                            # ⚠️ 本地环境变量（不会同步）
 ```
 
