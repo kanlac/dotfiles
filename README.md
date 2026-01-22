@@ -84,10 +84,18 @@ source ~/.zshrc
 
 ```
 ~
+├── README.md                       # 本文件
+├── CLAUDE.md -> README.md          # 软链接，供 Claude Code 读取
+├── yadm-docs/                      # 方案文档
+│   └── coding-agents-scheme.md     # Coding Agents 方案说明
 ├── .zshrc                          # Zsh 主配置文件
 ├── .claude/
 │   └── settings.json               # Claude Code hooks 和 plugins 配置
 ├── .config/
+│   ├── yadm/
+│   │   ├── bootstrap               # 自动安装脚本
+│   │   └── ignore                  # yadm gitignore 规则
+│   ├── agents.json                 # Coding Agents 统一配置源
 │   ├── iterm2/
 │   │   ├── com.googlecode.iterm2.plist  # iTerm2 主配置
 │   │   ├── gruvbox-light.itermcolors    # 颜色主题
@@ -95,13 +103,6 @@ source ~/.zshrc
 │   ├── nvim/
 │   │   ├── init.lua                # Neovim 配置
 │   │   └── lazy-lock.json          # lazy.nvim 插件锁定文件
-│   ├── yadm/
-│   │   ├── README.md               # 本文件
-│   │   ├── bootstrap               # 自动安装脚本
-│   │   ├── coding-agents.json      # Coding Agents 统一配置源
-│   │   ├── ignore                  # yadm gitignore 规则
-│   │   └── docs/
-│   │       └── coding-agents-scheme.md  # Coding Agents 方案说明
 │   └── zsh-custom/
 │       ├── aliases.zsh             # 自定义别名
 │       ├── oc.zsh                  # 其他自定义配置

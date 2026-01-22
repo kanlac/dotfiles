@@ -90,7 +90,7 @@ if [ -d "$HOME/.config/zsh-custom" ]; then
 fi
 
 # ===== Coding Agents Configuration =====
-CONFIG_SOURCE="$HOME/.config/yadm/coding-agents.json"
+CONFIG_SOURCE="$HOME/.config/agents.json"
 
 if [ -f "$CONFIG_SOURCE" ] && command -v jq &> /dev/null; then
     echo "Applying coding agents configuration..."
