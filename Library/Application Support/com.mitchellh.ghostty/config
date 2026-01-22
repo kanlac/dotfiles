@@ -42,7 +42,7 @@ background-opacity-cells = true
 
 # Blur background when background-opacity < 1.
 # Valid: integer intensity, true (=20), false (=0). :contentReference[oaicite:6]{index=6}
-background-blur = 15
+background-blur = 10
 
 # Dim unfocused splits (1 disables). :contentReference[oaicite:7]{index=7}
 unfocused-split-opacity = 0.90

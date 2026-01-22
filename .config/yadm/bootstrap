@@ -57,6 +57,10 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
 fi
 
 # Install zsh-autosuggestions plugin
+# Source .zshrc to get ZSH_CUSTOM definition
+if [ -f "$HOME/.zshrc" ]; then
+    source "$HOME/.zshrc"
+fi
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
     echo "Installing zsh-autosuggestions..."
