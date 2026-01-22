@@ -18,7 +18,20 @@
       "gopls-lsp@claude-plugins-official",
       "document-skills@anthropic-agent-skills",
       "example-skills@anthropic-agent-skills"
-    ]
+    ],
+    "hooks": {
+      "Stop": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "say -v Sinji \"搞掂\""
+            }
+          ]
+        }
+      ]
+    }
   },
   "opencode": {
     "mcp": {

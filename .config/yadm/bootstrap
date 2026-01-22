@@ -122,6 +122,22 @@ if [ -f "$CONFIG_SOURCE" ] && command -v jq &> /dev/null; then
             claude plugins install "$plugin" 2>/dev/null || true
         done
     fi
+
+    # ----- Claude: Merge hooks and enabledPlugins to settings.json -----
+    CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+    if [ -f "$CLAUDE_SETTINGS" ]; then
+        jq --slurpfile src "$CONFIG_SOURCE" '
+          .hooks = (.hooks // {}) * $src[0].claude.hooks |
+          .enabledPlugins = (.enabledPlugins // {}) * ($src[0].claude.plugins | map({(.): true}) | add)
+        ' "$CLAUDE_SETTINGS" > /tmp/settings.json.tmp && mv /tmp/settings.json.tmp "$CLAUDE_SETTINGS"
+    else
+        mkdir -p "$HOME/.claude"
+        jq '{
+          hooks: .claude.hooks,
+          enabledPlugins: (.claude.plugins | map({(.): true}) | add)
+        }' "$CONFIG_SOURCE" > "$CLAUDE_SETTINGS"
+    fi
+    echo "  Claude hooks and enabledPlugins merged"
 fi
 
 echo ""
