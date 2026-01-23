@@ -33,3 +33,30 @@ keybind = cmd+j=text:\x1b
 # Quality of Life
 macos-option-as-alt = true
 confirm-close-surface = false
+
+
+# ===== Ghostty -> tmux default keybinds (prefix = Ctrl-b) =====
+# Ctrl-b = \x02 (hex escape, not \u0002)
+
+# 分屏：tmux 
+keybind = cmd+d=text:\x02%
+keybind = cmd+shift+d=text:\x02"
+
+# 切 pane（下一个）：tmux 默认 prefix + o
+keybind = cmd+o=text:\x02o
+
+# 新 window：tmux 默认 prefix + c
+keybind = cmd+t=text:\x02c
+
+# 切 window：tmux 默认 prefix + p/n
+keybind = cmd+p=text:\x02p
+keybind = cmd+n=text:\x02n
+
+# 关闭 pane：使用 tmux 自定义快捷键 prefix + K
+# 需要在 ~/.tmux.conf 中配置: bind-key K kill-pane
+keybind = cmd+w=text:\x02K
+
+# Zoom pane：tmux 默认 prefix + z
+keybind = cmd+z=text:\x02z
+
+
