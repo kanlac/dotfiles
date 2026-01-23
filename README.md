@@ -42,14 +42,21 @@ yadm bootstrap
 
 这个脚本会自动安装：
 - Homebrew（macOS）
-- Neovim 和 im-select（输入法切换工具）
-- jq（JSON 处理工具）
-- oh-my-zsh
-- zsh-autosuggestions 插件
-- zsh-syntax-highlighting 插件
-- zoxide（智能目录跳转）
-- 链接自定义 zsh 配置
-- 配置 Coding Agents（Claude Code、OpenCode 的 MCP servers 和插件）
+- 开发工具：
+  - Neovim（文本编辑器）
+  - ripgrep（快速文本搜索）
+  - fd（快速文件查找）
+  - fzf（模糊查找工具）
+  - jq（JSON 处理工具）
+  - im-select（输入法切换工具，macOS）
+- 终端工具：
+  - zoxide（智能目录跳转）
+  - Ghostty（现代终端模拟器）
+- Shell 配置：
+  - oh-my-zsh
+  - zsh-autosuggestions 插件
+  - zsh-syntax-highlighting 插件
+- Coding Agents（Claude Code、OpenCode 的 MCP servers 和插件）
 
 ### 4. 创建环境变量文件
 
@@ -192,6 +199,48 @@ nvim
 **包含的插件**：
 - vim-surround - 快速环绕操作
 - gruvbox.nvim - 主题
+- fzf-lua - 模糊查找工具（文件搜索、文本搜索等）
+
+**fzf-lua 快捷键**：
+- `,ff` - 查找文件（支持软链接目录）
+- `,fg` - 全局搜索文本（支持软链接目录）
+- `,fb` - 查找已打开的 Buffer
+- `,fh` - 查找帮助文档
+- `,fo` - 最近打开的文件
+
+### 命令行工具
+
+**ripgrep (rg)** - 超快的文本搜索工具
+```bash
+# 搜索文本（自动忽略 .gitignore 的文件）
+rg "search term"
+
+# 搜索并显示上下文
+rg -C 3 "search term"
+
+# 跟随软链接搜索
+rg --follow "search term"
+```
+
+**fd** - 超快的文件查找工具
+```bash
+# 查找文件
+fd filename
+
+# 查找并跟随软链接
+fd --follow filename
+
+# 查找特定类型的文件
+fd -e js -e ts  # 只查找 .js 和 .ts 文件
+```
+
+**fzf** - 通用的模糊查找工具
+```bash
+# 快捷键（已自动配置）
+# Ctrl+T - 在当前目录查找文件并插入路径
+# Ctrl+R - 搜索命令历史
+# Alt+C - 模糊搜索目录并跳转
+```
 
 ### Ghostty
 
