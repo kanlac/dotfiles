@@ -36,13 +36,46 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- 插件：就三个，够用且稳定
 require("lazy").setup({
   { "tpope/vim-surround" },
 
-  -- 选一个“浅色也舒服”的主题（推荐这个，观感清晰，Visual 也明显）
-  -- { "folke/tokyonight.nvim", lazy = false, priority = 1000, opts = { style = "day" } },
   { "ellisonleao/gruvbox.nvim", lazy = false, priority = 1000, opts = { style = "day" } },
+
+  -- fzf-lua：模糊查找工具
+  {
+    "ibhagwan/fzf-lua",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("fzf-lua").setup({
+        -- 全局配置
+        winopts = {
+          height = 0.85,
+          width = 0.80,
+          preview = {
+            layout = "vertical",
+            vertical = "down:50%",
+          },
+        },
+        -- 文件查找配置
+        files = {
+          -- 使用 fd（更快，支持软链接）
+          -- --no-ignore-vcs: 忽略 .gitignore 规则，这样软链接目录即使在 .gitignore 中也能被搜索
+          cmd = "fd --type f --follow --hidden --no-ignore-vcs --exclude .git --exclude node_modules --exclude .next --exclude dist --exclude build --exclude .cache --exclude vendor --exclude .venv --exclude __pycache__",
+          -- 备选方案（如果没有 fd）
+          -- cmd = "rg --files --follow --hidden --glob '!.git'",
+          -- cmd = "find -L . -type f 2>/dev/null | sed 's#^./##'",
+        },
+        -- 文本搜索配置
+        grep = {
+          -- 跟随软链接，并排除常见目录
+          rg_opts = "--follow --hidden --column --line-number --no-heading --color=always --smart-case " ..
+                    "--glob=!.git/ --glob=!node_modules/ --glob=!.next/ --glob=!dist/ --glob=!build/ " ..
+                    "--glob=!.cache/ --glob=!vendor/ --glob=!.venv/ --glob=!__pycache__/ " ..
+                    "--glob=!*.min.js --glob=!*.min.css",
+        },
+      })
+    end,
+  },
 })
 
 -- 启用主题
@@ -51,6 +84,13 @@ vim.cmd.colorscheme("gruvbox")
 
 -- 你的段落包裹：需要 remap 才能触发 surround 的 ys
 map("n", "<leader>p", "ysip<p>", { silent = true, remap = true })
+
+-- fzf-lua 快捷键
+map("n", "<leader>ff", "<cmd>lua require('fzf-lua').files()<CR>", { desc = "查找文件" })
+map("n", "<leader>fg", "<cmd>lua require('fzf-lua').live_grep()<CR>", { desc = "全局搜索" })
+map("n", "<leader>fb", "<cmd>lua require('fzf-lua').buffers()<CR>", { desc = "查找 Buffer" })
+map("n", "<leader>fh", "<cmd>lua require('fzf-lua').help_tags()<CR>", { desc = "查找帮助" })
+map("n", "<leader>fo", "<cmd>lua require('fzf-lua').oldfiles()<CR>", { desc = "最近文件" })
 
 -- 延时退出插入模式的 timer
 local exit_insert_timer = nil
