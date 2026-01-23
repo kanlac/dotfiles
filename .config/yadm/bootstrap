@@ -18,53 +18,55 @@ if [[ "$OS" == "Darwin" ]]; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
 
-    # Function to install brew package if not already installed
-    install_brew_package() {
-        local cmd="$1"
-        local package="$2"
-        local extra_args="${3:-}"
+    # Install zoxide if not already installed
+    if ! command -v zoxide &> /dev/null; then
+        echo "Installing zoxide..."
+        brew install zoxide
+    fi
 
-        if ! command -v "$cmd" &> /dev/null; then
-            echo "Installing $package..."
-            brew install $extra_args "$package"
-        else
-            echo "✓ $package already installed"
-        fi
-    }
+    # Install Neovim if not already installed
+    if ! command -v nvim &> /dev/null; then
+        echo "Installing Neovim..."
+        brew install neovim
+    fi
 
-    # Homebrew packages to install
-    # Format: "command_name|package_name|extra_args"
-    BREW_PACKAGES=(
-        "zoxide|zoxide"
-        "nvim|neovim"
-        "jq|jq"
-        "fzf|fzf"
-        "rg|ripgrep"
-        "fd|fd"
-        "ghostty|ghostty|--cask"
-    )
-
-    # Install packages
-    for pkg_info in "${BREW_PACKAGES[@]}"; do
-        IFS='|' read -r cmd package extra_args <<< "$pkg_info"
-        install_brew_package "$cmd" "$package" "$extra_args"
-    done
-
-    # Special handling: im-select (requires tap)
+    # Install im-select for input method switching (macOS only)
     if ! command -v im-select &> /dev/null; then
         echo "Installing im-select..."
         brew tap daipeihust/tap
         brew install im-select
-    else
-        echo "✓ im-select already installed"
     fi
 
-    # Special handling: fzf shell integration
-    if command -v fzf &> /dev/null; then
-        if [ ! -f "$HOME/.fzf.zsh" ]; then
-            echo "Setting up fzf shell integration..."
-            $(brew --prefix)/opt/fzf/install --all --no-bash --no-fish
-        fi
+    # Install jq for JSON processing
+    if ! command -v jq &> /dev/null; then
+        echo "Installing jq..."
+        brew install jq
+    fi
+
+    # Install fzf (fuzzy finder)
+    if ! command -v fzf &> /dev/null; then
+        echo "Installing fzf..."
+        brew install fzf
+        # Install shell key bindings and fuzzy completion
+        $(brew --prefix)/opt/fzf/install --all --no-bash --no-fish
+    fi
+
+    # Install ripgrep (fast text search)
+    if ! command -v rg &> /dev/null; then
+        echo "Installing ripgrep..."
+        brew install ripgrep
+    fi
+
+    # Install fd (fast file finder)
+    if ! command -v fd &> /dev/null; then
+        echo "Installing fd..."
+        brew install fd
+    fi
+
+    # Install Ghostty terminal
+    if ! command -v ghostty &> /dev/null; then
+        echo "Installing Ghostty..."
+        brew install --cask ghostty
     fi
 fi
 
