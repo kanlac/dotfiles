@@ -68,7 +68,8 @@ require("lazy").setup({
         -- 文本搜索配置
         grep = {
           -- 跟随软链接，并排除常见目录
-          rg_opts = "--follow --hidden --column --line-number --no-heading --color=always --smart-case " ..
+          -- --no-ignore-vcs: 忽略 .gitignore 规则，这样软链接目录即使在 .gitignore 中也能被搜索
+          rg_opts = "--follow --hidden --no-ignore-vcs --column --line-number --no-heading --color=always --smart-case " ..
                     "--glob=!.git/ --glob=!node_modules/ --glob=!.next/ --glob=!dist/ --glob=!build/ " ..
                     "--glob=!.cache/ --glob=!vendor/ --glob=!.venv/ --glob=!__pycache__/ " ..
                     "--glob=!*.min.js --glob=!*.min.css",
