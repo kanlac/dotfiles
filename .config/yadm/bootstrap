@@ -43,6 +43,14 @@ if [[ "$OS" == "Darwin" ]]; then
         brew install jq
     fi
 
+    # Install fzf (fuzzy finder)
+    if ! command -v fzf &> /dev/null; then
+        echo "Installing fzf..."
+        brew install fzf
+        # Install shell key bindings and fuzzy completion
+        $(brew --prefix)/opt/fzf/install --all --no-bash --no-fish
+    fi
+
     # Install Ghostty terminal
     if ! command -v ghostty &> /dev/null; then
         echo "Installing Ghostty..."

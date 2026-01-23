@@ -78,7 +78,6 @@ export ZSH_CUSTOM="$HOME/.config/zsh-custom"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git 
-  zoxide
   zsh-autosuggestions
   zsh-syntax-highlighting # this should be at the last!
 )
@@ -116,3 +115,5 @@ eval "$(zoxide init zsh)"
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

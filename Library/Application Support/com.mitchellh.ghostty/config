@@ -51,12 +51,14 @@ keybind = cmd+t=text:\x02c
 # 切 window：tmux 默认 prefix + p/n
 keybind = cmd+p=text:\x02p
 keybind = cmd+n=text:\x02n
+keybind = cmd+w=text:\x02w
 
 # 关闭 pane：使用 tmux 自定义快捷键 prefix + K
 # 需要在 ~/.tmux.conf 中配置: bind-key K kill-pane
-keybind = cmd+w=text:\x02K
+keybind = cmd+x=text:\x02K
 
 # Zoom pane：tmux 默认 prefix + z
 keybind = cmd+z=text:\x02z
 
-
+# enter copy mode
+keybind = cmd+left_bracket=text:\x02[
