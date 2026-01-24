@@ -13,6 +13,8 @@ vim.opt.shiftwidth = 2
 vim.opt.hlsearch = true
 vim.opt.termguicolors = true     -- 直接拥抱真彩色，省心
 vim.opt.background = "light"     -- 你是浅色
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 -- 让 y/p/d 等默认走系统剪贴板（等价于 set clipboard=unnamedplus）
 vim.opt.clipboard = "unnamedplus"
 
