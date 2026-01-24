@@ -30,8 +30,10 @@ keybind = cmd+j=text:\x1b
 
 # Quality of Life
 macos-option-as-alt = true
-focus-events = true
 confirm-close-surface = false
+
+# Fix remote terminal rendering issues
+term = xterm-256color
 
 
 # ===== Ghostty -> tmux default keybinds (prefix = Ctrl-b) =====
