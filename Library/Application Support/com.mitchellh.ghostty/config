@@ -30,6 +30,7 @@ keybind = cmd+j=text:\x1b
 
 # Quality of Life
 macos-option-as-alt = true
+focus-events = true
 confirm-close-surface = false
 
 

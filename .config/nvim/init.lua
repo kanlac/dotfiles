@@ -169,9 +169,6 @@ if vim.fn.executable("im-select") == 1 then
   })
 end
 
-
-
-
 -- 让 nvim 背景透明（配合终端透明）
 vim.opt.termguicolors = true
 
@@ -200,3 +197,37 @@ vim.api.nvim_create_autocmd("ColorScheme", {
   callback = transparent,
 })
 
+--------------- file autoupdate ----------------
+
+-- 10s 触发 CursorHold / CursorHoldI（单位：毫秒）
+vim.opt.updatetime = 10000
+
+-- 外部修改时：buffer 干净(未修改)就自动 reload
+vim.opt.autoread = true
+
+-- 这些时机去检查“磁盘上的文件是否变了”
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  callback = function()
+    -- checktime 会触发文件时间戳检查；
+    -- 配合 autoread：未修改的 buffer 会自动重载
+    vim.cmd("checktime")
+  end,
+})
+
+-- 可选：reload 发生后给个提示（不想提示就删掉这一段）
+vim.api.nvim_create_autocmd("FileChangedShellPost", {
+  callback = function()
+    vim.notify("File changed on disk, reloaded.", vim.log.levels.INFO)
+  end,
+})
+
+-- 可选：如果你的 buffer 有未保存修改，磁盘文件又变了，给更明显提示
+vim.api.nvim_create_autocmd("FileChangedShell", {
+  callback = function()
+    if vim.bo.modified then
+      vim.notify("File changed on disk, but you have unsaved changes (not reloaded).", vim.log.levels.WARN)
+    end
+  end,
+})
+
+------------------------------------------------
