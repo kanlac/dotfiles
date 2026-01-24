@@ -79,6 +79,49 @@ require("lazy").setup({
       })
     end,
   },
+
+  {
+    "neovim/nvim-lspconfig",
+    config = function()
+      -- 使用新的 vim.lsp.config API（Neovim 0.11+）
+      vim.lsp.config('gopls', {
+        cmd = { 'gopls' },
+        filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+        root_markers = { 'go.work', 'go.mod', '.git' },
+        settings = {
+          gopls = {
+            staticcheck = true,
+          },
+        },
+      })
+
+      -- 为 Go 文件设置 LSP 快捷键
+      vim.api.nvim_create_autocmd('LspAttach', {
+        callback = function(args)
+          local bufnr = args.buf
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+          -- 只为 gopls 设置快捷键
+          if client and client.name == 'gopls' then
+            local opts = { buffer = bufnr }
+            -- 跳转定义
+            vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+            -- 跳转到类型定义（Go 中更有用）
+            vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, opts)
+            -- 查看引用
+            vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+            -- 悬浮文档
+            vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+            -- 重命名
+            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+          end
+        end,
+      })
+
+      -- 启用 gopls（会在打开 Go 文件时自动启动）
+      vim.lsp.enable('gopls')
+    end,
+  },
 })
 
 -- 启用主题
