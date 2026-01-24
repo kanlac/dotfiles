@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # yadm Bootstrap Script
 # This script automatically installs oh-my-zsh plugins and tools when setting up on a new machine
@@ -47,7 +48,10 @@ if [[ "$OS" == "Darwin" ]]; then
     if ! command -v fzf &> /dev/null; then
         echo "Installing fzf..."
         brew install fzf
-        # Install shell key bindings and fuzzy completion
+    fi
+    # Ensure fzf shell integration is installed
+    if [ ! -f "$HOME/.fzf.zsh" ]; then
+        echo "Installing fzf shell integration..."
         $(brew --prefix)/opt/fzf/install --all --no-bash --no-fish
     fi
 
@@ -77,10 +81,7 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
 fi
 
 # Install zsh-autosuggestions plugin
-# Source .zshrc to get ZSH_CUSTOM definition
-if [ -f "$HOME/.zshrc" ]; then
-    source "$HOME/.zshrc"
-fi
+# Note: Don't source .zshrc here as it contains zsh-specific syntax
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
     echo "Installing zsh-autosuggestions..."
