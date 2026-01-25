@@ -100,18 +100,24 @@ require("lazy").setup({
         },
       })
 
-      -- 为 Go 文件设置 LSP 快捷键
+      -- TypeScript/JavaScript Language Server
+      vim.lsp.config('ts_ls', {
+        cmd = { 'typescript-language-server', '--stdio' },
+        filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+        root_markers = { 'package.json', 'tsconfig.json', 'jsconfig.json', '.git' },
+      })
+
+      -- 为所有 LSP 设置快捷键
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
           local bufnr = args.buf
           local client = vim.lsp.get_client_by_id(args.data.client_id)
 
-          -- 只为 gopls 设置快捷键
-          if client and client.name == 'gopls' then
+          if client then
             local opts = { buffer = bufnr }
             -- 跳转定义
             vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-            -- 跳转到类型定义（Go 中更有用）
+            -- 跳转到类型定义
             vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, opts)
             -- 查看引用
             vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
@@ -123,8 +129,9 @@ require("lazy").setup({
         end,
       })
 
-      -- 启用 gopls（会在打开 Go 文件时自动启动）
+      -- 启用 LSP
       vim.lsp.enable('gopls')
+      vim.lsp.enable('ts_ls')
     end,
   },
 })
@@ -162,6 +169,11 @@ vim.keymap.set("n", "<leader>yp", function()
   vim.notify("Yanked path: " .. rel)
 end, { desc = "Yank path relative to (l)cd" })
 
+vim.keymap.set("n", "<leader>tt", function()
+  local t = os.date("%H:%M")
+  vim.api.nvim_put({ t }, "c", true, true)
+  vim.cmd("startinsert!")
+end, { desc = "Insert time and enter insert mode" })
 
 -- 延时退出插入模式的 timer
 local exit_insert_timer = nil
