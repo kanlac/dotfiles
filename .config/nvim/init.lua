@@ -143,6 +143,26 @@ map("n", "<leader>fb", "<cmd>lua require('fzf-lua').buffers()<CR>", { desc = "�
 map("n", "<leader>fh", "<cmd>lua require('fzf-lua').help_tags()<CR>", { desc = "查找帮助" })
 map("n", "<leader>fo", "<cmd>lua require('fzf-lua').oldfiles()<CR>", { desc = "最近文件" })
 
+-- yank path 目录拷贝快捷键
+vim.keymap.set("n", "<leader>yp", function()
+  local file = vim.api.nvim_buf_get_name(0)
+  if file == "" then
+    vim.notify("No file name for current buffer", vim.log.levels.WARN)
+    return
+  end
+
+  local cwd = vim.fn.getcwd()            -- 注意：会返回“当前窗口的 cwd”，所以跟 lcd 对齐
+  local rel = vim.fs.relpath(cwd, file)  -- 相对 cwd 的路径
+
+  if not rel then
+    rel = file -- 不在 cwd 下就退回绝对路径
+  end
+
+  vim.fn.setreg("+", rel)
+  vim.notify("Yanked path: " .. rel)
+end, { desc = "Yank path relative to (l)cd" })
+
+
 -- 延时退出插入模式的 timer
 local exit_insert_timer = nil
 
