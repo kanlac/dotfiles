@@ -11,12 +11,17 @@ vim.opt.expandtab = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.hlsearch = true
-vim.opt.termguicolors = true     -- 直接拥抱真彩色，省心
+vim.opt.termguicolors = true     -- 真彩色, 配合终端透明背景
 vim.opt.background = "light"     -- 你是浅色
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 -- 让 y/p/d 等默认走系统剪贴板（等价于 set clipboard=unnamedplus）
 vim.opt.clipboard = "unnamedplus"
+
+-- 显示字符数：普通模式显示全文件 chars；可视模式显示选中区域 visual_chars
+vim.o.statusline = (vim.o.statusline ~= "" and vim.o.statusline or "%f%m%r%h%w%=%-14.(%l,%c%V%) %P")
+  .. "  %{mode()=~#'^[vV\\]' ? wordcount().visual_chars.' sel' : wordcount().chars.'c'}"
+
 
 -- 输入法：离开插入模式切回 ABC（有 im-select 才启用）
 if vim.fn.executable("im-select") == 1 then
@@ -211,9 +216,6 @@ if vim.fn.executable("im-select") == 1 then
     end,
   })
 end
-
--- 让 nvim 背景透明（配合终端透明）
-vim.opt.termguicolors = true
 
 local function transparent()
   local groups = {
