@@ -15,8 +15,8 @@ vim.opt.termguicolors = true     -- 真彩色, 配合终端透明背景
 vim.opt.background = "light"     -- 你是浅色
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
--- 让 y/p/d 等默认走系统剪贴板（等价于 set clipboard=unnamedplus）
-vim.opt.clipboard = "unnamedplus"
+-- 禁用 unnamedplus, 不让 y/p/d 等默认走系统剪贴板, 避免污染 nvim 自己的寄存器体系，手动通过 OSC52 同步到本地系统剪贴板，remote 环境友好
+-- vim.opt.clipboard = "unnamedplus"
 
 -- 显示字符数：普通模式显示全文件 chars；可视模式显示选中区域 visual_chars
 vim.o.statusline = (vim.o.statusline ~= "" and vim.o.statusline or "%f%m%r%h%w%=%-14.(%l,%c%V%) %P")
@@ -132,6 +132,37 @@ require("lazy").setup({
       -- 启用 LSP
       vim.lsp.enable('gopls')
       vim.lsp.enable('ts_ls')
+    end,
+  },
+
+  -- 用于剪贴板传递，兼容本地/远程环境
+  {
+    "ojroques/nvim-osc52",
+    config = function()
+      local osc52 = require("osc52")
+
+      osc52.setup({
+        max_length = 0,      -- 0 = 不限（但终端可能有限制）
+        silent = true,
+        trim = false,
+      })
+
+      -- visual mode: <leader>y 把选区复制到「本地」剪贴板
+      vim.keymap.set("v", "<leader>y", function()
+        osc52.copy_visual()
+      end, { desc = "OSC52 yank (visual)" })
+
+      -- normal mode: <leader>yy 复制当前行到「本地」剪贴板
+      vim.keymap.set("n", "<leader>yy", function()
+        vim.cmd("normal! yy")                 -- 保持 nvim 内部寄存器正常（p 仍可用）
+        require("osc52").copy_register('"')   -- 把匿名寄存器内容同步到本地剪贴板
+      end, { desc = "Yank line + OSC52 sync" })
+
+      -- normal mode: <leader>y 进入 operator-pending，后面接 motion / textobject
+      vim.keymap.set("n", "<leader>y", function()
+        return require("osc52").copy_operator()
+      end, { expr = true, desc = "OSC52 yank with motion/textobject" })
+
     end,
   },
 })
@@ -307,3 +338,4 @@ vim.api.nvim_create_autocmd("FileChangedShell", {
 })
 
 ------------------------------------------------
+
