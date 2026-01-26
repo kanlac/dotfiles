@@ -148,6 +148,21 @@ if [ -f "$CONFIG_SOURCE" ] && command -v jq &> /dev/null; then
         }' "$CONFIG_SOURCE" > "$CLAUDE_SETTINGS"
     fi
     echo "  Claude hooks and enabledPlugins merged"
+
+    # ----- Codex: Export config to TOML -----
+    if jq -e '.codex.config' "$CONFIG_SOURCE" &> /dev/null; then
+        echo "Syncing Codex configuration..."
+
+        # Ensure Python dependencies are installed
+        if ! python3 -c "import tomlkit" 2>/dev/null; then
+            echo "  Installing required Python packages..."
+            pip3 install tomlkit --quiet --user --break-system-packages 2>/dev/null || \
+            pip3 install tomlkit --quiet --user
+        fi
+
+        # Run Python script to sync config
+        python3 "$HOME/.config/yadm/scripts/sync-codex-config.py"
+    fi
 fi
 
 echo ""
