@@ -23,15 +23,6 @@ vim.o.statusline = (vim.o.statusline ~= "" and vim.o.statusline or "%f%m%r%h%w%=
   .. "  %{mode()=~#'^[vV\\]' ? wordcount().visual_chars.' sel' : wordcount().chars.'c'}"
 
 
--- 输入法：离开插入模式切回 ABC（有 im-select 才启用）
-if vim.fn.executable("im-select") == 1 then
-  vim.api.nvim_create_autocmd("InsertLeave", {
-    callback = function()
-      pcall(vim.fn.system, { "im-select", "com.apple.keylayout.ABC" })
-    end,
-  })
-end
-
 -- 安装 lazy.nvim（如果没有就自动装）
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
@@ -205,64 +196,76 @@ vim.keymap.set("n", "<leader>tt", function()
   vim.cmd("startinsert!")
 end, { desc = "Insert time and enter insert mode" })
 
--- 延时退出插入模式的 timer
-local exit_insert_timer = nil
+-- 延时自动保存的 timer（FocusLost 和 InsertLeave 共用）
+local autosave_timer = nil
+
+-- 启动延时保存（1m 后保存）
+-- exit_insert: 是否在保存前先退出插入模式
+local function start_autosave_timer(exit_insert)
+  if autosave_timer then
+    vim.fn.timer_stop(autosave_timer)
+  end
+  autosave_timer = vim.fn.timer_start(60000, function()
+    if exit_insert then
+      local m = vim.fn.mode()
+      if m == "i" or m == "R" or m == "Rv" then
+        vim.cmd("stopinsert")
+      end
+    end
+    vim.cmd("silent! update")
+    autosave_timer = nil
+  end)
+end
+
+-- 取消延时保存
+local function cancel_autosave_timer()
+  if autosave_timer then
+    vim.fn.timer_stop(autosave_timer)
+    autosave_timer = nil
+  end
+end
 
 vim.api.nvim_create_augroup("focus_lost_actions", { clear = true })
 
 vim.api.nvim_create_autocmd("FocusLost", {
   group = "focus_lost_actions",
   callback = function()
-    -- 只在插入/替换模式时启动延时
-    local m = vim.fn.mode()
-    if m == "i" or m == "R" or m == "Rv" then
-      -- 如果已经有等待中的 timer，先取消
-      if exit_insert_timer then
-        vim.fn.timer_stop(exit_insert_timer)
-      end
-
-      -- 设置 1 分钟后执行：退出插入模式 + 保存 + 切换输入法
-      exit_insert_timer = vim.fn.timer_start(6000, function()
-        -- 1) 退出插入模式
-        vim.cmd("stopinsert")
-
-        -- 2) 保存文件
-        vim.cmd("silent! update")
-
-        -- 3) 切换输入法到英文
-        if vim.fn.executable("im-select") == 1 then
-          pcall(vim.fn.system, { "im-select", "com.apple.keylayout.ABC" })
-        end
-
-        exit_insert_timer = nil
-      end)
-    else
-      -- 如果不在插入模式，立即保存（但不切换输入法）
-      vim.cmd("silent! update")
-    end
+    start_autosave_timer(true)  -- 延时退出插入 + 保存
   end,
 })
 
--- 获得焦点时，智能处理
 vim.api.nvim_create_autocmd("FocusGained", {
   group = "focus_lost_actions",
   callback = function()
-    -- 如果有等待中的 timer，取消它
-    if exit_insert_timer then
-      vim.fn.timer_stop(exit_insert_timer)
-      exit_insert_timer = nil
-    end
+    cancel_autosave_timer()
 
-    -- 检查当前模式
+    -- 如果在 normal/visual mode，切换到英文输入法
     local m = vim.fn.mode()
-
-    -- 如果在 normal mode 或 visual mode，切换到英文输入法
     if m == "n" or m == "no" or m == "v" or m == "V" then
       if vim.fn.executable("im-select") == 1 then
         pcall(vim.fn.system, { "im-select", "com.apple.keylayout.ABC" })
       end
     end
-    -- 如果在插入模式，不做任何操作（保持当前输入法）
+  end,
+})
+
+vim.api.nvim_create_autocmd("InsertLeave", {
+  group = "focus_lost_actions",
+  callback = function()
+    -- 立即切换输入法
+    if vim.fn.executable("im-select") == 1 then
+      pcall(vim.fn.system, { "im-select", "com.apple.keylayout.ABC" })
+    end
+
+    -- 启动延时保存（不退出插入，因为已经退出了）
+    start_autosave_timer(false)
+  end,
+})
+
+vim.api.nvim_create_autocmd("InsertEnter", {
+  group = "focus_lost_actions",
+  callback = function()
+    cancel_autosave_timer()
   end,
 })
 
