@@ -170,8 +170,7 @@ vim.keymap.set("n", "<leader>yp", function()
 end, { desc = "Yank path relative to (l)cd" })
 
 vim.keymap.set("n", "<leader>tt", function()
-  local t = os.date("%H:%M")
-  vim.api.nvim_put({ t }, "c", true, true)
+  vim.api.nvim_paste(os.date("%H:%M") .. " ", true, -1)
   vim.cmd("startinsert!")
 end, { desc = "Insert time and enter insert mode" })
 
