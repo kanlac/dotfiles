@@ -134,7 +134,7 @@ require("lazy").setup({
 
       osc52.setup({
         max_length = 0,      -- 0 = 不限（但终端可能有限制）
-        silent = true,
+        silent = false,
         trim = false,
       })
 
@@ -153,6 +153,18 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>y", function()
         return require("osc52").copy_operator()
       end, { expr = true, desc = "OSC52 yank with motion/textobject" })
+
+      -- visual mode: <leader>d 删除选区并复制到系统剪贴板
+      vim.keymap.set("v", "<leader>d", function()
+        vim.cmd('normal! d')  -- 删除选区（进入匿名寄存器）
+        require("osc52").copy_register('"')  -- 同步到系统剪贴板
+      end, { desc = "Delete and OSC52 copy (visual)" })
+
+      -- normal mode: <leader>dd 删除当前行并复制到系统剪贴板
+      vim.keymap.set("n", "<leader>dd", function()
+        vim.cmd("normal! dd")                 -- 删除当前行（进入匿名寄存器）
+        require("osc52").copy_register('"')   -- 同步到系统剪贴板
+      end, { desc = "Delete line + OSC52 sync" })
 
     end,
   },
