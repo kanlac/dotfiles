@@ -125,29 +125,28 @@ if [ -f "$CONFIG_SOURCE" ] && command -v jq &> /dev/null; then
         echo "  OpenCode MCP servers merged"
     fi
 
-    # ----- Claude: Install plugins -----
+    # ----- Claude: Execute plugin installation commands -----
     if command -v claude &> /dev/null; then
         echo "Installing Claude plugins..."
-        jq -r '.claude.plugins[]' "$CONFIG_SOURCE" | while read plugin; do
-            claude plugins install "$plugin" 2>/dev/null || true
+        jq -r '.claude.commands[]' "$CONFIG_SOURCE" | while read cmd; do
+            echo "  Running: $cmd"
+            eval "$cmd" 2>/dev/null || true
         done
     fi
 
-    # ----- Claude: Merge hooks and enabledPlugins to settings.json -----
+    # ----- Claude: Merge hooks to settings.json -----
     CLAUDE_SETTINGS="$HOME/.claude/settings.json"
     if [ -f "$CLAUDE_SETTINGS" ]; then
         jq --slurpfile src "$CONFIG_SOURCE" '
-          .hooks = (.hooks // {}) * $src[0].claude.hooks |
-          .enabledPlugins = (.enabledPlugins // {}) * ($src[0].claude.plugins | map({(.): true}) | add)
+          .hooks = (.hooks // {}) * $src[0].claude.hooks
         ' "$CLAUDE_SETTINGS" > /tmp/settings.json.tmp && mv /tmp/settings.json.tmp "$CLAUDE_SETTINGS"
     else
         mkdir -p "$HOME/.claude"
         jq '{
-          hooks: .claude.hooks,
-          enabledPlugins: (.claude.plugins | map({(.): true}) | add)
+          hooks: .claude.hooks
         }' "$CONFIG_SOURCE" > "$CLAUDE_SETTINGS"
     fi
-    echo "  Claude hooks and enabledPlugins merged"
+    echo "  Claude hooks merged"
 
     # ----- Codex: Export config to TOML -----
     if jq -e '.codex.config' "$CONFIG_SOURCE" &> /dev/null; then

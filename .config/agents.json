@@ -12,12 +12,14 @@
         "type": "stdio"
       }
     },
-    "plugins": [
-      "context7@claude-plugins-official",
-      "plugin-dev@claude-plugins-official",
-      "gopls-lsp@claude-plugins-official",
-      "document-skills@anthropic-agent-skills",
-      "example-skills@anthropic-agent-skills"
+    "commands": [
+      "claude plugin marketplace add ~/Documents/agile-dev",
+      "claude plugin install agile-dev@agile-dev",
+      "claude plugin install context7@claude-plugins-official",
+      "claude plugin install plugin-dev@claude-plugins-official",
+      "claude plugin install gopls-lsp@claude-plugins-official",
+      "claude plugin install document-skills@anthropic-agent-skills",
+      "claude plugin install example-skills@anthropic-agent-skills"
     ],
     "hooks": {
       "Stop": [
