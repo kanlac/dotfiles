@@ -35,7 +35,19 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-  { "tpope/vim-surround" },
+  {
+    "kylechui/nvim-surround",
+    version = "*",
+    config = function()
+      require("nvim-surround").setup({
+        indent_lines = false,  -- 禁用自动缩进
+      })
+
+      -- visual mode: 用 <p> 标签包裹选中内容
+      -- S (surround) -> t (tag) -> p (标签名) -> CR (确认)
+      vim.keymap.set("v", "<leader>t", "St<p><CR>", { silent = false, remap = true, desc = "Wrap with <p> tag" })
+    end,
+  },
 
   { "ellisonleao/gruvbox.nvim", lazy = false, priority = 1000, opts = { style = "day" } },
 
@@ -173,9 +185,6 @@ require("lazy").setup({
 -- 启用主题
 -- vim.cmd.colorscheme("tokyonight-day")
 vim.cmd.colorscheme("gruvbox")
-
--- 你的段落包裹：需要 remap 才能触发 surround 的 ys
-map("n", "<leader>p", "ysip<p>", { silent = true, remap = true })
 
 -- fzf-lua 快捷键
 map("n", "<leader>ff", "<cmd>lua require('fzf-lua').files()<CR>", { desc = "查找文件" })
