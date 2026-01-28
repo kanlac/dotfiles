@@ -161,11 +161,6 @@ require("lazy").setup({
         require("osc52").copy_register('"')   -- 把匿名寄存器内容同步到本地剪贴板
       end, { desc = "Yank line + OSC52 sync" })
 
-      -- normal mode: <leader>y 进入 operator-pending，后面接 motion / textobject
-      vim.keymap.set("n", "<leader>y", function()
-        return require("osc52").copy_operator()
-      end, { expr = true, desc = "OSC52 yank with motion/textobject" })
-
       -- visual mode: <leader>d 删除选区并复制到系统剪贴板
       vim.keymap.set("v", "<leader>d", function()
         vim.cmd('normal! d')  -- 删除选区（进入匿名寄存器）
