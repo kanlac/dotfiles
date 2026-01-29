@@ -254,25 +254,12 @@ vim.api.nvim_create_autocmd("FocusGained", {
   group = "focus_lost_actions",
   callback = function()
     cancel_autosave_timer()
-
-    -- 如果在 normal/visual mode，切换到英文输入法
-    local m = vim.fn.mode()
-    if m == "n" or m == "no" or m == "v" or m == "V" then
-      if vim.fn.executable("im-select") == 1 then
-        pcall(vim.fn.system, { "im-select", "com.apple.keylayout.ABC" })
-      end
-    end
   end,
 })
 
 vim.api.nvim_create_autocmd("InsertLeave", {
   group = "focus_lost_actions",
   callback = function()
-    -- 立即切换输入法
-    if vim.fn.executable("im-select") == 1 then
-      pcall(vim.fn.system, { "im-select", "com.apple.keylayout.ABC" })
-    end
-
     -- 启动延时保存（不退出插入，因为已经退出了）
     start_autosave_timer(false)
   end,
@@ -288,15 +275,6 @@ vim.api.nvim_create_autocmd("InsertEnter", {
 -- 🔧 确保焦点事件不被忽略
 vim.opt.eventignore:remove("FocusGained")
 vim.opt.eventignore:remove("FocusLost")
-
--- 只在启动 Neovim 时切回英文输入法
-if vim.fn.executable("im-select") == 1 then
-  vim.api.nvim_create_autocmd("VimEnter", {
-    callback = function()
-      pcall(vim.fn.system, { "im-select", "com.apple.keylayout.ABC" })
-    end,
-  })
-end
 
 local function transparent()
   local groups = {

@@ -25,9 +25,6 @@ window-inherit-font-size = false
 # Window
 macos-titlebar-style = tabs
 
-# Keybindings
-keybind = cmd+j=text:\x1b
-
 # Quality of Life
 macos-option-as-alt = true
 confirm-close-surface = false
