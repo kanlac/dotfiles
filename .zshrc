@@ -117,3 +117,5 @@ source $ZSH/oh-my-zsh.sh
 eval "$(zoxide init zsh)"
  # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+[[ -r ~/.zshrc.local ]] && source ~/.zshrc.local
