@@ -14,7 +14,7 @@
           "conditions": [
             {
               "type": "frontmost_application_if",
-              "bundle_identifiers": ["^YOUR_GHOSTTY_BUNDLE_ID_HERE$"]
+              "bundle_identifiers": ["com.mitchellh.ghostty"]
             }
           ]
         }
@@ -32,6 +32,12 @@
           "to": [
             { "shell_command": "/opt/homebrew/bin/im-select com.apple.keylayout.ABC"},
             { "key_code": "escape" }
+          ],
+          "conditions": [
+            {
+              "type": "frontmost_application_if",
+              "bundle_identifiers": ["com.mitchellh.ghostty"]
+            }
           ]
         }
       ]
