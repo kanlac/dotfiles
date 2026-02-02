@@ -1,11 +1,6 @@
 {
   "claude": {
     "mcpServers": {
-      "playwright": {
-        "command": "npx",
-        "args": ["@playwright/mcp@latest"],
-        "type": "stdio"
-      },
       "chrome-devtools": {
         "command": "npx",
         "args": ["chrome-devtools-mcp@latest"],
@@ -19,7 +14,9 @@
       "claude plugin install plugin-dev@claude-plugins-official",
       "claude plugin install gopls-lsp@claude-plugins-official",
       "claude plugin install document-skills@anthropic-agent-skills",
-      "claude plugin install example-skills@anthropic-agent-skills"
+      "claude plugin install example-skills@anthropic-agent-skills",
+      "npx skills add vercel-labs/agent-browser -g -a claude-code codex -y ",
+      "npx skills add https://github.com/anthropics/skills --skill skill-creator -g -y -a claude-code codex"
     ],
     "hooks": {
       "Stop": [
