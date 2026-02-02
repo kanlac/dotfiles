@@ -208,7 +208,10 @@ vim.keymap.set("n", "<leader>yp", function()
 end, { desc = "Yank path relative to (l)cd" })
 
 vim.keymap.set("n", "<leader>tt", function()
-  vim.api.nvim_paste(os.date("%H:%M") .. " ", true, -1)
+  -- 在下一行新开一行（等价于按 o），光标移动到新行并进入 insert
+  vim.cmd("normal! o")
+  -- 在新行插入时间（此时光标已在新行）
+  vim.api.nvim_put({ os.date("%H:%M") .. " " }, "c", true, true)
   vim.cmd("startinsert!")
 end, { desc = "Insert time and enter insert mode" })
 
