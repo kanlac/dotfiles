@@ -336,3 +336,14 @@ vim.api.nvim_create_autocmd("FileChangedShell", {
 
 ------------------------------------------------
 
+-- 替换/搜索执行后自动取消高亮（不影响你下一次 / 搜索时继续高亮）
+vim.api.nvim_create_autocmd("CmdlineLeave", {
+  pattern = ":",
+  callback = function()
+    -- 防抖：避免在某些情况下闪烁
+    vim.schedule(function()
+      vim.cmd("nohlsearch")
+    end)
+  end,
+})
+
