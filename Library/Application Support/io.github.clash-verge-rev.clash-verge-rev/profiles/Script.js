@@ -1,6 +1,7 @@
 const prependRule = [
   "DOMAIN-SUFFIX,reddit.com,BosLife",
   "DOMAIN-KEYWORD,chaoci,BosLife",
+  "PROCESS-NAME,git-remote-http,BosLife",
   // claude
   "PROCESS-NAME,claude,BosLife",
   "PROCESS-NAME,2.1.29,BosLife",
