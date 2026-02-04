@@ -1,4 +1,16 @@
 {
+  "commands": [
+    "claude plugin marketplace add ~/Documents/agile-dev",
+    "claude plugin install agile-dev@agile-dev",
+    "claude plugin install context7@claude-plugins-official",
+    "claude plugin install plugin-dev@claude-plugins-official",
+    "claude plugin install gopls-lsp@claude-plugins-official",
+    "claude plugin install document-skills@anthropic-agent-skills",
+    "claude plugin install example-skills@anthropic-agent-skills",
+    "npx skills add vercel-labs/agent-browser -g -a claude-code codex -y ",
+    "npx skills add https://github.com/anthropics/skills --skill skill-creator -g -y -a claude-code codex",
+    "codex mcp add context7 -- npx -y @upstash/context7-mcp"
+  ],
   "claude": {
     "mcpServers": {
       "chrome-devtools": {
@@ -7,17 +19,6 @@
         "type": "stdio"
       }
     },
-    "commands": [
-      "claude plugin marketplace add ~/Documents/agile-dev",
-      "claude plugin install agile-dev@agile-dev",
-      "claude plugin install context7@claude-plugins-official",
-      "claude plugin install plugin-dev@claude-plugins-official",
-      "claude plugin install gopls-lsp@claude-plugins-official",
-      "claude plugin install document-skills@anthropic-agent-skills",
-      "claude plugin install example-skills@anthropic-agent-skills",
-      "npx skills add vercel-labs/agent-browser -g -a claude-code codex -y ",
-      "npx skills add https://github.com/anthropics/skills --skill skill-creator -g -y -a claude-code codex"
-    ],
     "hooks": {
       "Stop": [
         {
