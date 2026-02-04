@@ -3,9 +3,10 @@ const prependRule = [
   "DOMAIN-KEYWORD,chaoci,BosLife",
   "PROCESS-NAME,git-remote-http,BosLife",
   // claude
-  "PROCESS-NAME,claude,BosLife",
-  "PROCESS-NAME,2.1.29,BosLife",
+  "PROCESS-PATH-REGEX,/Users/kan/.local/share/claude/*,BosLife",
   "DOMAIN-KEYWORD,claude,BosLife",
+  // 应该不需要
+  // "PROCESS-NAME,claude,BosLife",
   // wechat
   "PROCESS-NAME,WeChat,DIRECT",
   // 或更稳
