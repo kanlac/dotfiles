@@ -61,7 +61,7 @@ keybind = cmd+down=text:\x02)
 
 # 关闭 pane：使用 tmux 自定义快捷键 prefix + K
 # 需要在 ~/.tmux.conf 中配置: bind-key K kill-pane
-keybind = cmd+x=text:\x02K
+keybind = cmd+w=text:\x02K
 
 # Zoom pane：tmux 默认 prefix + z
 keybind = cmd+z=text:\x02z
