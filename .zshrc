@@ -68,6 +68,12 @@ ZSH_THEME="robbyrussell"
 # see 'man strftime' for details.
 # HIST_STAMPS="mm/dd/yyyy"
 
+# alias-finder
+zstyle ':omz:plugins:alias-finder' autoload yes # disabled by default
+zstyle ':omz:plugins:alias-finder' longer yes # disabled by default
+zstyle ':omz:plugins:alias-finder' exact yes # disabled by default
+zstyle ':omz:plugins:alias-finder' cheaper yes # disabled by default
+
 # Would you like to use another custom folder than $ZSH/custom?
 export ZSH_CUSTOM="$HOME/.config/zsh-custom"
 
@@ -77,7 +83,15 @@ export ZSH_CUSTOM="$HOME/.config/zsh-custom"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
+  # From Oh-My-Zsh
+  alias-finder
   git 
+  1password
+  copybuffer
+  copypath
+  docker
+  docker-compose
+  # Custom plugins
   zsh-autosuggestions
   zsh-syntax-highlighting # this should be at the last!
 )
