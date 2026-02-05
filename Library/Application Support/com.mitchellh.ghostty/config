@@ -11,9 +11,9 @@
 theme = dark:"Gruvbox Dark",light:"Gruvbox Light"
 
 # Background
-background-opacity = 0.8
+background-opacity = 0.85
 background-opacity-cells = true
-background-blur = 10
+background-blur = 40
 unfocused-split-opacity = 0.90
 
 # Font
