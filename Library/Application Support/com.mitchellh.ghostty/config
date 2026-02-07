@@ -26,6 +26,8 @@ window-inherit-font-size = false
 macos-titlebar-style = tabs
 ## cell 整除后余下的像素部分用颜色填充（解决 tmux status bar 漂浮问题）
 window-padding-color = extend
+## Start window maximize
+maximize = true
 
 # Quality of Life
 macos-option-as-alt = true
