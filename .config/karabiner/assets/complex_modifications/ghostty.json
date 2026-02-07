@@ -8,7 +8,8 @@
           "type": "basic",
           "from": { "key_code": "escape" },
           "to": [
-            { "shell_command": "/opt/homebrew/bin/im-select com.apple.keylayout.ABC" },
+            { "select_input_source": { "input_source_id": "com.apple.keylayout.ABC" } },
+            { "key_code": "vk_none", "hold_down_milliseconds": 120 },
             { "key_code": "escape" }
           ],
           "conditions": [
@@ -30,7 +31,8 @@
             "modifiers": { "mandatory": ["command"], "optional": ["any"] }
           },
           "to": [
-            { "shell_command": "/opt/homebrew/bin/im-select com.apple.keylayout.ABC"},
+            { "select_input_source": { "input_source_id": "com.apple.keylayout.ABC" } },
+            { "key_code": "vk_none", "hold_down_milliseconds": 120 },
             { "key_code": "escape" }
           ],
           "conditions": [
