@@ -55,6 +55,8 @@ keybind = cmd+left=text:\x02p
 keybind = cmd+right=text:\x02n
 keybind = cmd+w=text:\x02w
 
+keybind = cmd+y=text:\x02y
+
 # Session 切换：tmux 默认 prefix + ( 和 prefix + )
 keybind = cmd+up=text:\x02(
 keybind = cmd+down=text:\x02)

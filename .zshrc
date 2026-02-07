@@ -101,6 +101,8 @@ source $ZSH/oh-my-zsh.sh
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
+# Setting neovim as default man pager
+export MANPAGER='nvim +Man! -'
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
