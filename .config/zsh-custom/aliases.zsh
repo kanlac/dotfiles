@@ -6,3 +6,4 @@ alias codex='codex --dangerously-bypass-approvals-and-sandbox'
 
 alias lg='lazygit'
 alias yg='yadm enter lazygit'
+
