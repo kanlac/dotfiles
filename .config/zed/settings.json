@@ -1,0 +1,69 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "agent": {
+    "default_model": {
+      "provider": "Antigravity-Manager",
+      "model": "claude-sonnet-4-5-thinking",
+    },
+    "favorite_models": [],
+    "model_parameters": [],
+  },
+  "language_models": {
+    "openai_compatible": {
+      "a2": {
+        "api_url": "http://127.0.0.1:8045/v1",
+        "available_models": [
+          {
+            "name": "gemini-3-pro-high",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false,
+              "chat_completions": true,
+            },
+          },
+        ],
+      },
+      "Antigravity-Manager": {
+        "api_url": "http://127.0.0.1:8045/v1",
+        "available_models": [
+          {
+            "name": "claude-sonnet-4-5-thinking",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false,
+              "chat_completions": true,
+            },
+          },
+        ],
+      },
+    },
+  },
+  "session": {
+    "trust_all_worktrees": true,
+  },
+  "vim_mode": true,
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": {
+    "mode": "system",
+    "light": "Gruvbox Light",
+    "dark": "Gruvbox Dark",
+  },
+}
