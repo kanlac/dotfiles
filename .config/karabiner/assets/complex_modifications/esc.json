@@ -1,26 +1,6 @@
 {
-  "title": "ESC / Cmd+J -> switch to ABC then send ESC",
+  "title": "Cmd+J -> switch to ABC then send ESC",
   "rules": [
-    {
-      "description": "ESC -> clear candidates, switch to ABC, then ESC",
-      "manipulators": [
-        {
-          "type": "basic",
-          "from": { "key_code": "escape" },
-          "to": [
-            { "key_code": "escape" },
-            { "key_code": "vk_none", "hold_down_milliseconds": 50 },
-            {
-              "select_input_source": {
-                "input_source_id": "com.apple.keylayout.ABC"
-              }
-            },
-            { "key_code": "vk_none", "hold_down_milliseconds": 50 },
-            { "key_code": "escape" }
-          ]
-        }
-      ]
-    },
     {
       "description": "Cmd+J -> clear candidates, switch to ABC, then ESC",
       "manipulators": [
