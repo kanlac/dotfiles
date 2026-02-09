@@ -9,51 +9,15 @@
 {
   "agent": {
     "default_model": {
-      "provider": "Antigravity-Manager",
-      "model": "claude-sonnet-4-5-thinking",
+      "provider": "Antigravity-Tools",
+      "model": "claude-sonnet-4-5",
     },
     "favorite_models": [],
     "model_parameters": [],
   },
   "language_models": {
     "openai_compatible": {
-      "a2": {
-        "api_url": "http://127.0.0.1:8045/v1",
-        "available_models": [
-          {
-            "name": "gemini-3-pro-high",
-            "max_tokens": 200000,
-            "max_output_tokens": 32000,
-            "max_completion_tokens": 200000,
-            "capabilities": {
-              "tools": true,
-              "images": false,
-              "parallel_tool_calls": false,
-              "prompt_cache_key": false,
-              "chat_completions": true,
-            },
-          },
-        ],
       },
-      "Antigravity-Manager": {
-        "api_url": "http://127.0.0.1:8045/v1",
-        "available_models": [
-          {
-            "name": "claude-sonnet-4-5-thinking",
-            "max_tokens": 200000,
-            "max_output_tokens": 32000,
-            "max_completion_tokens": 200000,
-            "capabilities": {
-              "tools": true,
-              "images": false,
-              "parallel_tool_calls": false,
-              "prompt_cache_key": false,
-              "chat_completions": true,
-            },
-          },
-        ],
-      },
-    },
   },
   "session": {
     "trust_all_worktrees": true,
