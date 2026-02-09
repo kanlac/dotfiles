@@ -8,7 +8,7 @@
           "type": "basic",
           "from": {
             "key_code": "j",
-            "modifiers": { "mandatory": ["command"], "optional": ["any"] }
+            "modifiers": { "mandatory": ["command"] }
           },
           "to": [
             { "key_code": "escape" },
