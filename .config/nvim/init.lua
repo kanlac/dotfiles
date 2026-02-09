@@ -175,6 +175,25 @@ require("lazy").setup({
 
     end,
   },
+
+  -- Advanced motion, 基于关键词的跳转
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  -- 支持中文（拼音加加双拼）跳转
+  {
+    "kanlac/flash-zh.nvim",
+    dependencies = { "folke/flash.nvim" },
+    opts = { scheme = "pyjj" },
+    keys = {
+      { "s", mode = { "n", "x", "o" }, function() require("flash-zh").jump({ chinese_only = false }) end, desc = "Flash between Chinese" },
+      { "r", mode = "o", function() require("flash-zh").remote({ chinese_only = false }) end, desc = "Remote Flash between Chinese" },
+    },
+  },
+
 })
 
 -- 启用主题
@@ -349,4 +368,3 @@ vim.api.nvim_create_autocmd("CmdlineLeave", {
     end)
   end,
 })
-
