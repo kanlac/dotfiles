@@ -62,6 +62,7 @@ keybind = cmd+y=text:\x02y
 # Session 切换：tmux 默认 prefix + ( 和 prefix + )
 keybind = cmd+up=text:\x02(
 keybind = cmd+down=text:\x02)
+keybind = cmd+l=text:\x02)
 
 # 关闭 pane：使用 tmux 自定义快捷键 prefix + K
 # 需要在 ~/.tmux.conf 中配置: bind-key K kill-pane
