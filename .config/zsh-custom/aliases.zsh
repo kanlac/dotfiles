@@ -6,6 +6,7 @@ alias codex='codex --dangerously-bypass-approvals-and-sandbox'
 
 alias lg='lazygit'
 alias yg='yadm enter lazygit'
+alias og='lazygit --git-dir=$HOME/git-repos/obsidian-vault --work-tree="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/obsidian"'
 
 # Antigravity Manager 更新
 alias update-antigravity='~/bin/update-antigravity.sh'
