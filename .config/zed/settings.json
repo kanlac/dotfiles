@@ -12,6 +12,23 @@
       "milliseconds": 1000
     }
   },
+  "file_finder": {
+    "include_ignored": "all"
+  },
+  "ssh_connections": [
+    {
+      "host": "kans-mac-mini",
+      "username": "kan",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/Users/kan/Documents/agent-researches"
+          ]
+        }
+      ]
+    }
+  ],
   "agent": {
     "default_model": {
       "provider": "Antigravity-Tools",
