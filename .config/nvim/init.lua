@@ -4,6 +4,9 @@ vim.g.maplocalleader = " "
 
 local map = vim.keymap.set
 
+-- move visual line
+vim.keymap.set("n", "J", "gj", { noremap = true, silent = true })
+vim.keymap.set("n", "K", "gk", { noremap = true, silent = true })
 -- vic, vac 选中 Markdown 代码块
 map('x', 'ic', '<Esc>?^```<CR>jV/^```<CR>k', { desc = "Select inner markdown code block", silent = true })
 map('x', 'ac', '<Esc>?^```<CR>V/^```<CR>', { desc = "Select around markdown code block", silent = true })
