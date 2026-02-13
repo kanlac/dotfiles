@@ -4,6 +4,10 @@ vim.g.maplocalleader = " "
 
 local map = vim.keymap.set
 
+-- vic, vac 选中 Markdown 代码块
+map('x', 'ic', '<Esc>?^```<CR>jV/^```<CR>k', { desc = "Select inner markdown code block", silent = true })
+map('x', 'ac', '<Esc>?^```<CR>V/^```<CR>', { desc = "Select around markdown code block", silent = true })
+
 -- 基础编辑体验
 vim.opt.number = true
 vim.opt.relativenumber = true
