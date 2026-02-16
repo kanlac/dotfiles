@@ -7,6 +7,8 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "max_tabs": 5,
+  "relative_line_numbers": "enabled",
   "autosave": {
     "after_delay": {
       "milliseconds": 1000
