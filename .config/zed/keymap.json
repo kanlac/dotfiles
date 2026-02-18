@@ -29,5 +29,11 @@
     "bindings": {
       "alt-cmd-j": "workspace::ToggleBottomDock"
     }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-j": null
+    }
   }
 ]
