@@ -7,6 +7,7 @@
     "claude plugin install example-skills@anthropic-agent-skills",
     "claude plugin marketplace add kanlac/agent-steroids",
     "claude plugin install steroids@agent-steroids",
+    "npx skills add https://github.com/kanlac/agent-steroids -g -y -a codex",
     "npx skills add vercel-labs/agent-browser -g -a claude-code codex -y ",
     "npx skills add https://github.com/anthropics/skills -g -y -a claude-code codex",
     "codex mcp add context7 -- npx -y @upstash/context7-mcp"
