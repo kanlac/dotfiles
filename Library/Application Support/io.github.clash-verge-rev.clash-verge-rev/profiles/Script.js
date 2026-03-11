@@ -7,6 +7,7 @@ const prependRule = [
 
   // ===== 特定应用规则 =====
   "PROCESS-NAME,WeChat,DIRECT",        // 微信直连
+  "PROCESS-NAME,qbittorrent,DIRECT",  // qBittorrent 直连
   "PROCESS-NAME,git-remote-http,BosLife",
   "PROCESS-PATH-REGEX,/Users/kan/.local/share/claude/*,BosLife",
 
