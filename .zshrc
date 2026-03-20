@@ -128,3 +128,10 @@ eval "$(zoxide init zsh)"
 [[ -r ~/.zshrc.local ]] && source ~/.zshrc.local
 
 
+
+# bun completions
+[ -s "/Users/kan/.bun/_bun" ] && source "/Users/kan/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

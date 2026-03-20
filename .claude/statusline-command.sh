@@ -46,4 +46,22 @@ out_fmt=$(fmt_tokens "$total_out")
 # Approximate cost: $3/M input, $15/M output (Sonnet pricing)
 cost=$(echo "$total_in $total_out" | awk '{printf "%.3f", ($1 * 3 + $2 * 15) / 1000000}')
 
-printf "${CYAN}ctx:${used_pct_int:-?}%%${RESET} ${DIM}|${RESET} ${MAGENTA}${model}${RESET} ${DIM}|${RESET} ${BLUE}session:${session_id}${RESET} ${DIM}|${RESET} ${GREEN}in:${in_fmt} out:${out_fmt}${RESET} ${DIM}|${RESET} ${YELLOW}\$${cost}${RESET}"
+# Rate limit usage (Claude.ai subscription; only present after first API response)
+five_pct=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+week_pct=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+rate_str=""
+if [ -n "$five_pct" ]; then
+  rate_str="${rate_str}5h:$(printf '%.0f' "$five_pct")%"
+fi
+if [ -n "$week_pct" ]; then
+  [ -n "$rate_str" ] && rate_str="${rate_str} "
+  rate_str="${rate_str}7d:$(printf '%.0f' "$week_pct")%"
+fi
+
+# Build output — append rate limits only when data is available
+base="${CYAN}ctx:${used_pct_int:-?}%${RESET} ${DIM}|${RESET} ${MAGENTA}${model}${RESET} ${DIM}|${RESET} ${BLUE}session:${session_id}${RESET} ${DIM}|${RESET} ${GREEN}in:${in_fmt} out:${out_fmt}${RESET} ${DIM}|${RESET} ${YELLOW}\$${cost}${RESET}"
+if [ -n "$rate_str" ]; then
+  printf '%b' "${base} ${DIM}|${RESET} ${YELLOW}${rate_str}${RESET}"
+else
+  printf '%b' "${base}"
+fi
