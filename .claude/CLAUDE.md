@@ -7,6 +7,7 @@
 
 - **Skill 不能有外部依赖**：Skill 文档（SKILL.md 及其引用的子文档）中不能引用 Skill 目录外的文件路径（如 `docs/`、`data/`、`sql/` 等）。Skill 是自包含的方法论，不依赖项目中的具体文件。如果需要提示"参考已有样本"，用搜索指引（如"在项目中搜索 xxx"）代替硬编码路径。
 - **Skill 写方向不写步骤**：方法论文档重点说明**意图和方向**（为什么要这么做、典型模板有哪些），而非详细的操作步骤。用 2-3 个典型示例启发 agent 理解目标，而不是写 step-by-step 教程。Agent 是有判断力的，给方向比给步骤更有效。
+- **Skill 要写成通用的**：不要引用个人特有的工具链或配置（如 `agents.json`、`yadm bootstrap`、特定 tmux session 名），而是用通用描述。Skill 面向所有用户，不是只给自己用的备忘录。
 
 # 代理配置
 
@@ -28,3 +29,27 @@
 - **Teammate**（用户说「启动 teammate」「用 teammate」）：通过 `TeamCreate` 创建 team → `TaskCreate` 建任务 → `Agent` tool 带 `team_name` + `name` 参数 spawn。Teammate 是独立的 Claude Code 实例，用户可直接交互（Shift+Down 切换），teammate 之间可互相通信，通过共享 task list 协调
 - **Subagent**（用户说「用 subagent」）：通过 `Agent` tool 不带 `team_name` spawn。在主会话内运行，结果只返回给主 agent，用户无法直接交互
 - 用户说「teammate」时绝不能用 subagent 代替，反之亦然
+
+# Agent Steroids 项目
+
+- 项目路径：`/Users/kan/Documents/agent-steroids`
+- 当用户说「在 Agent Steroids 中创建 Skill」「编辑 Skill」「创建 Command」时，都指这个目录
+- Skill 放在 `skills/` 子目录，Command 放在 `commands/` 子目录
+
+# 计划文档编写规则
+
+- **闭环**：计划必须从开始执行到最终验证形成完整闭环。不能停在"更新完配置"就结束——必须包含端到端测试、数据校验等步骤，确保改动真正生效
+- **每个 Phase 有验证**：每个阶段结束时必须有可执行的验证步骤（命令、脚本、SQL 查询），不能只写"检查是否正确"
+- **标注人工确认节点**：需要用户决策的节点用醒目标记（如 🔵），并明确说明需要用户确认什么。其余 Phase 默认自主执行，尽量减少用户介入
+
+# 文档和代码规范
+
+- **不要在文档/代码中硬编码用户名**：Skill 文档、脚本、配置示例中使用 `$HOME`、`~`、`$USER` 等变量或占位符，不要出现具体的用户名（如 `/Users/kan/`）
+
+# 文档查询
+
+- **不要用 Context7 MCP 查 Claude Code 文档**：Context7 的索引有滞后，查不到新版本的字段和功能。查 Claude Code 最新文档用 `defuddle parse "https://docs.anthropic.com/en/docs/claude-code/<page>" --md` 直接抓官网
+
+# Telegram Channel 交互
+
+- 收到 Telegram 消息后，先对该消息发送一个 👀 emoji react，表示正在处理，然后再开始实际工作
