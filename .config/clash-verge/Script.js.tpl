@@ -46,6 +46,7 @@ const prependRule = [
 
   // ===== 其他域名 =====
   "DOMAIN-KEYWORD,reddit,BosLife",
+  "DOMAIN-KEYWORD,runpod,BosLife",
 
   // ===== IP 地理位置规则 =====
   "GEOIP,PRIVATE,DIRECT",
