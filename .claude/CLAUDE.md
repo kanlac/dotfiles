@@ -1,13 +1,43 @@
+# Dotfiles 管理
+
+- 使用 [yadm](https://yadm.io) 管理个人配置文件，详见 `~/README.md`
+
 # Git SSH 配置
 
 - 默认使用 `github.com`（例如 `git@github.com:user/repo.git`）
 - mindfit 项目使用 `mindfitgit` 作为 git SSH host
+
+# Git 历史重写禁令
+
+- **不要用 `git filter-branch`**：它会重写整棵 commit 树的 hash，导致分支与 master 断开共同祖先，GitHub 上无法正常 diff/PR。cherry-pick 重建分支时极易丢失文件（亲历：base.css 和 main.js 改动丢失，全站样式崩溃）
+- **从历史中删文件的正确做法**：在新 commit 里 `git rm` + 加 `.gitignore`，不重写历史。如果确实需要清除敏感数据，用 `git filter-repo`（比 filter-branch 安全）
+- **重建分支后必须验证**：如果不得已做了 cherry-pick 重建，必须检查关键文件（入口文件、配置文件、CSS 入口）是否完整，跑一遍 `git diff` 确认改动数量与预期一致
+
+# Skill 优先原则
+
+- **有专门 Skill 可用时，必须优先调用 Skill，不要因为"觉得自己能搞定"就绕过**。Skill 封装了专门的流程和质量保障（如 `skill-creator:skill-creator` 用于创建 skill，`superpowers:writing-plans` 用于写计划），跳过它等于放弃专门工具的价值。即使当前上下文已经充足，Skill 的流程本身也是一层额外的质量检查。
 
 # Skill 编写规则
 
 - **Skill 不能有外部依赖**：Skill 文档（SKILL.md 及其引用的子文档）中不能引用 Skill 目录外的文件路径（如 `docs/`、`data/`、`sql/` 等）。Skill 是自包含的方法论，不依赖项目中的具体文件。如果需要提示"参考已有样本"，用搜索指引（如"在项目中搜索 xxx"）代替硬编码路径。
 - **Skill 写方向不写步骤**：方法论文档重点说明**意图和方向**（为什么要这么做、典型模板有哪些），而非详细的操作步骤。用 2-3 个典型示例启发 agent 理解目标，而不是写 step-by-step 教程。Agent 是有判断力的，给方向比给步骤更有效。
 - **Skill 要写成通用的**：不要引用个人特有的工具链或配置（如 `agents.json`、`yadm bootstrap`、特定 tmux session 名），而是用通用描述。Skill 面向所有用户，不是只给自己用的备忘录。
+
+# Chrome 浏览器自动化（强制规则）
+
+**凡是需要有头（GUI）Chrome 的场景，必须先 invoke `steroids:cdp-chrome` Skill，然后严格遵循其规则。**
+
+适用场景（不限于）：
+- 访问社交媒体：X/Twitter 浏览/发帖、Reddit 采集帖子、Instagram 等
+- **读取社交媒体页面内容**：读取推文、帖子等内容时，直接用 CDP Chrome + `take_snapshot`，**不要先尝试 defuddle 或 WebFetch**——这些工具在社交媒体上必定失败（JS 渲染 + 反爬）
+- 新闻/文章核实：检查发布日期、获取 JS 渲染页面
+- 需要登录态的网站操作
+- 反自动化检测的网站访问
+- 网页表单交互、截图
+
+不适用：无头测试自有代码、PDF 生成、Playwright/Puppeteer 单元测试
+
+**禁止自行启动 Chrome 实例。** 所有 agent 共用一个干净的共享 Chrome（`~/.config/cdp-chrome/`），通过 `mcp__chrome-devtools__*` 工具或直连 CDP API 操作。
 
 # 代理配置
 
@@ -32,8 +62,8 @@
 
 # Agent Steroids 项目
 
+- 用于存放共享的、公开的 Claude 插件，个人专属的 skill 放全局 `~/.claude/` 下，不放这个项目
 - 项目路径：`/Users/kan/Documents/agent-steroids`
-- 当用户说「在 Agent Steroids 中创建 Skill」「编辑 Skill」「创建 Command」时，都指这个目录
 - Skill 放在 `skills/` 子目录，Command 放在 `commands/` 子目录
 
 # 计划文档编写规则
@@ -50,6 +80,9 @@
 
 - **不要用 Context7 MCP 查 Claude Code 文档**：Context7 的索引有滞后，查不到新版本的字段和功能。查 Claude Code 最新文档用 `defuddle parse "https://docs.anthropic.com/en/docs/claude-code/<page>" --md` 直接抓官网
 
+
 # Telegram Channel 交互
 
 - 收到 Telegram 消息后，先对该消息发送一个 👀 emoji react，表示正在处理，然后再开始实际工作
+- **当会话接入了 Telegram channel 时，所有回复都通过 Telegram reply 工具发送，不在终端输出回复内容**。终端只用于执行工具调用（查数据库、读文件等），最终结果回复到 Telegram
+- **Telegram 文件上传失败时**：Telegram plugin 的文件发送在 proxy 环境下会失败（Bun TLS bug，详见 `steroids:telegram-agents` Skill 的「Bun Proxy 文件上传问题」章节）。遇到 `Network request for 'sendDocument' failed!` 时，用 curl 直接调 Bot API 绕过：从状态目录的 `.env` 读 bot token，然后 `curl -X POST "https://api.telegram.org/bot$TOKEN/sendDocument" -F chat_id=<id> -F "document=@<path>"`
