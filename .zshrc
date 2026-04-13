@@ -135,3 +135,6 @@ eval "$(zoxide init zsh)"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# claude code
+export CLAUDE_CODE_NO_FLICKER=1

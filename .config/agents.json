@@ -7,20 +7,12 @@
         "command": "npx",
         "args": ["chrome-devtools-mcp@latest"],
         "type": "stdio"
+      },
+      "telegram-notify": {
+        "command": "bun",
+        "args": ["run", "/Users/kan/Documents/agent-steroids/mcp-servers/telegram-notify/server.ts"],
+        "type": "stdio"
       }
-    },
-    "hooks": {
-      "Stop": [
-        {
-          "matcher": "",
-          "hooks": [
-            {
-              "type": "command",
-              "command": "say -v Sinji \"搞掂\""
-            }
-          ]
-        }
-      ]
     }
   },
   "opencode": {
