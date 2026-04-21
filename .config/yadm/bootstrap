@@ -162,9 +162,32 @@ if [ -f "$CONFIG_SOURCE" ] && command -v jq &> /dev/null; then
     done
 fi
 
+# ===== Generate Clash Verge Script from template =====
+CLASH_SCRIPT_TPL="$HOME/.config/clash-verge/Script.js.tpl"
+CLASH_SCRIPT_OUT="$HOME/Library/Application Support/io.github.clash-verge-rev.clash-verge-rev/profiles/Script.js"
+
+if [ -f "$CLASH_SCRIPT_TPL" ]; then
+    # Load .env to get CLASH_SELF_* variables
+    [ -f "$HOME/.env" ] && source "$HOME/.env"
+
+    if [ -n "$LISA_LA_SERVER" ] && [ -n "$LISA_LA_UUID" ] && \
+       [ -n "$LISA_LA_PUBLIC_KEY" ] && [ -n "$LISA_LA_SHORT_ID" ]; then
+        mkdir -p "$(dirname "$CLASH_SCRIPT_OUT")"
+        sed -e "s|__LISA_LA_SERVER__|$LISA_LA_SERVER|g" \
+            -e "s|__LISA_LA_UUID__|$LISA_LA_UUID|g" \
+            -e "s|__LISA_LA_PUBLIC_KEY__|$LISA_LA_PUBLIC_KEY|g" \
+            -e "s|__LISA_LA_SHORT_ID__|$LISA_LA_SHORT_ID|g" \
+            "$CLASH_SCRIPT_TPL" > "$CLASH_SCRIPT_OUT"
+        echo "Clash Verge Script.js generated"
+    else
+        echo "Warning: LISA_LA_* variables not set in ~/.env, skipping Script.js generation"
+    fi
+fi
+
 echo ""
 echo "Bootstrap complete! Restart your shell to apply changes."
 echo ""
 echo "Don't forget to:"
 echo "  1. Create ~/.env file with your sensitive environment variables"
+echo "     (LISA_LA_SERVER, LISA_LA_UUID, LISA_LA_PUBLIC_KEY, LISA_LA_SHORT_ID)"
 echo "  2. Open Neovim to let lazy.nvim install plugins: nvim"
