@@ -86,3 +86,28 @@
 - 收到 Telegram 消息后，先对该消息发送一个 👀 emoji react，表示正在处理，然后再开始实际工作
 - **当会话接入了 Telegram channel 时，所有回复都通过 Telegram reply 工具发送，不在终端输出回复内容**。终端只用于执行工具调用（查数据库、读文件等），最终结果回复到 Telegram
 - **Telegram 文件上传失败时**：Telegram plugin 的文件发送在 proxy 环境下会失败（Bun TLS bug，详见 `steroids:telegram-agents` Skill 的「Bun Proxy 文件上传问题」章节）。遇到 `Network request for 'sendDocument' failed!` 时，用 curl 直接调 Bot API 绕过：从状态目录的 `.env` 读 bot token，然后 `curl -X POST "https://api.telegram.org/bot$TOKEN/sendDocument" -F chat_id=<id> -F "document=@<path>"`
+
+## Telegram 回复排版（MarkdownV2）
+
+调用 Telegram `reply` / `edit_message` 工具时**必须显式传 `format: "markdownv2"`**。不传等同于 `"text"`，会丢失所有格式；只有 log dump、错误堆栈、原始命令输出等无格式化需求的内容才显式传 `format: "text"`。
+
+**18 个特殊字符必须反斜杠转义**（漏一个就会 `Bad Request: can't parse entities` 整条消息失败）：
+
+`_` `*` `[` `]` `(` `)` `~` `` ` `` `>` `#` `+` `-` `=` `|` `{` `}` `.` `!`
+
+最常漏的四类场景：
+- **日期 / 版本号**：`2026-04-07` → `2026\-04\-07`，`v1.2.3` → `v1\.2\.3`
+- **域名 / 文件路径**：`example.com` → `example\.com`，`src/index.ts` → `src/index\.ts`
+- **英文句尾标点**：`Done.` → `Done\.`，`真的!` → `真的\!`（中文句号不用转义）
+- **行首连字符/井号/大于号**：`- 项目` → `\- 项目`（行首会被解析为列表/引用语法）
+
+三个例外区（原样输出，**不**转义 18 字符）：
+- **格式化标记本身**：`*粗体*`、`_斜体_`、`||剧透||`、`~删除线~` 的成对标记
+- **行内代码 `` `code` `` 和代码块 ` ``` ` 内部**：只转义 `` ` `` 和 `\`，其他字符原样。含复杂符号的片段（正则、JSON、SQL）优先用代码块包裹
+- **Markdown link 的 URL 部分**：`[文字](url)` 里 url 只转义 `)` 和 `\`，URL 自带的 `.` `-` `?` `=` `&` 不转义。例：`[文档](https://example.com/path?a=1&b=2)` 原样发送
+
+**发送前自检**：组装好文本、调用工具**之前**扫一遍——`format` 参数有没有？18 字符除了例外区是否全转义？行首特殊字符是否转义？英文句点/叹号是否转义？
+
+**兜底**：不确定的片段用行内代码 `` ` `` 包住；仍无把握就退回 `format: "text"` 发送纯文本——宁可丢格式，不要让消息发送失败。
+
+**`can't parse entities` 报错时**：立刻用 `edit_message` 或重发 `format: "text"` 纯文本让用户先看到内容，再定位漏转义字符（错误里有 offset 提示）、修好后发 MarkdownV2 版。不要反复试错。
