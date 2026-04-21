@@ -1,13 +1,5 @@
 {
   "commands": [
-    "claude plugin install context7@claude-plugins-official",
-    "claude plugin install plugin-dev@claude-plugins-official",
-    "claude plugin install gopls-lsp@claude-plugins-official",
-    "claude plugin install document-skills@anthropic-agent-skills",
-    "npx skills add vercel-labs/agent-browser -g -a claude-code codex -y ",
-    "npx skills add https://github.com/anthropics/skills -g -y -a claude-code codex",
-    "npx skills add git@github.com:kepano/obsidian-skills.git -g -y -a claude-code codex",
-    "codex mcp add context7 -- npx -y @upstash/context7-mcp"
   ],
   "claude": {
     "mcpServers": {
