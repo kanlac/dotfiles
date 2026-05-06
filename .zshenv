@@ -1,4 +1,3 @@
-
 # Load environment variables from ~/.env if it exists
 # NOTE: ~/.env is gitignored and should contain sensitive tokens/keys
 if [ -f "$HOME/.env" ]; then
