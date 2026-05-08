@@ -76,8 +76,13 @@ function main(config) {
     boslife.proxies = [SELF_NAME, ...(boslife.proxies || [])];
   }
 
+  // 兜底改为代理（fake-ip 模式下 GEOIP 规则不可靠，靠 GEOIP,CN 保国内直连）
+  config.rules = (config.rules || []).map(r =>
+    r === "MATCH,DIRECT" ? "MATCH,BosLife" : r
+  );
+
   // 前置规则
-  config.rules = prependRule.concat(config.rules || []);
+  config.rules = prependRule.concat(config.rules);
 
   return config;
 }
