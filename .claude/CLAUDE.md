@@ -22,6 +22,7 @@
 - **Skill 不能有外部依赖**：Skill 文档（SKILL.md 及其引用的子文档）中不能引用 Skill 目录外的文件路径（如 `docs/`、`data/`、`sql/` 等）。Skill 是自包含的方法论，不依赖项目中的具体文件。如果需要提示"参考已有样本"，用搜索指引（如"在项目中搜索 xxx"）代替硬编码路径。
 - **Skill 写方向不写步骤**：方法论文档重点说明**意图和方向**（为什么要这么做、典型模板有哪些），而非详细的操作步骤。用 2-3 个典型示例启发 agent 理解目标，而不是写 step-by-step 教程。Agent 是有判断力的，给方向比给步骤更有效。
 - **Skill 要写成通用的**：不要引用个人特有的工具链或配置（如 `agents.json`、`yadm bootstrap`、特定 tmux session 名），而是用通用描述。Skill 面向所有用户，不是只给自己用的备忘录。
+- **SKILL.md 和 CLAUDE.md 不超过 200 行**：超过则指令被稀释。精炼表述，详细流程拆到 `references/` 且必须被主文档引用。
 
 # Chrome 浏览器自动化（强制规则）
 
@@ -37,7 +38,7 @@
 
 不适用：无头测试自有代码、PDF 生成、Playwright/Puppeteer 单元测试
 
-**禁止自行启动 Chrome 实例。** 所有 agent 共用一个干净的共享 Chrome（`~/.config/cdp-chrome/`），通过 `mcp__chrome-devtools__*` 工具或直连 CDP API 操作。
+**禁止自行启动 Chrome 实例。** 所有 agent 共用一个干净的共享 Chrome（`~/.config/cdp-chrome/`），通过 `mcp__cdp-chrome__*` 工具或直连 CDP API 操作。
 
 # 代理配置
 
@@ -84,6 +85,10 @@
 # 文档和代码规范
 
 - **不要在文档/代码中硬编码用户名**：Skill 文档、脚本、配置示例中使用 `$HOME`、`~`、`$USER` 等变量或占位符，不要出现具体的用户名（如 `/Users/kan/`）
+
+# macOS 通知横幅关闭
+
+- 用 AppleScript 遍历 `NotificationCenter` 进程的所有 group 元素并 click，可触发"点击通知"效果使横幅消失（等同于用户手动点击，会同时打开对应 app）
 
 # 文档查询
 
