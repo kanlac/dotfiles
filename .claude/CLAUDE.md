@@ -46,6 +46,15 @@
 - SSH 代理（`~/.ssh/config`）通过 `ProxyCommand` 检测 `$all_proxy` 是否存在来决定是否走 SOCKS5 代理，不硬编码地址
 - 关闭代理：在 `~/.env` 中删除或注释 `PROXY=on`，然后重启 shell
 
+# Clash Verge 自建节点
+
+- 模板：`~/.config/clash-verge/Script.js.tpl`，通过 `yadm bootstrap` 用 `~/.env` 变量替换占位符生成 `Script.js`
+- 两个节点通过 `url-test` 组 `🏠 LA` 自动选延迟最低的：
+  - `🏠 LA-Direct`：VLESS+Reality+Vision，直连 VPS（移动数据好用，天津电信拥塞不可用）
+  - `🏠 LA-CDN`：VLESS+WS+TLS，经 Cloudflare CDN（域名 `kanlac.store`，电信宽带用）
+- `~/.env` 中 `LISA_CDN_SERVER` 控制 CDN 节点连接地址（域名或优选 IP），`LISA_CDN_DOMAIN` 始终为域名（用于 SNI/Host）
+- 修改模板后需运行 `yadm bootstrap` 重新生成，然后在 Clash Verge 中重载配置
+
 # CLAUDE.md 文件区分
 
 - **用户 CLAUDE.md**（`~/.claude/CLAUDE.md`）：全局指令，跨所有项目生效。用户说「更新用户 CLAUDE.md」指的是这个文件

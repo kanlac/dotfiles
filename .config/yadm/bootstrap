@@ -177,6 +177,8 @@ if [ -f "$CLASH_SCRIPT_TPL" ]; then
             -e "s|__LISA_LA_UUID__|$LISA_LA_UUID|g" \
             -e "s|__LISA_LA_PUBLIC_KEY__|$LISA_LA_PUBLIC_KEY|g" \
             -e "s|__LISA_LA_SHORT_ID__|$LISA_LA_SHORT_ID|g" \
+            -e "s|__LISA_CDN_SERVER__|${LISA_CDN_SERVER:-kanlac.store}|g" \
+            -e "s|__LISA_CDN_DOMAIN__|${LISA_CDN_DOMAIN:-kanlac.store}|g" \
             "$CLASH_SCRIPT_TPL" > "$CLASH_SCRIPT_OUT"
         echo "Clash Verge Script.js generated"
     else
