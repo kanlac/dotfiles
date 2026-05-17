@@ -164,14 +164,25 @@ function applyDns(config) {
       "https://8.8.8.8/dns-query",
     ],
     fallback: [],
-    "nameserver-policy": {},
+    "nameserver-policy": {
+      "geosite:cn": [
+        "https://223.5.5.5/dns-query",
+        "https://1.12.12.12/dns-query",
+      ],
+      "*.lan": "system",
+      "*.local": "system",
+      "*.ts.net": "100.100.100.100",
+    },
     // Keep bootstrap DNS literal to avoid a proxy-domain resolution loop.
     "proxy-server-nameserver": [
       "1.1.1.1",
       "8.8.8.8",
     ],
-    "direct-nameserver": [],
-    "direct-nameserver-follow-policy": false,
+    "direct-nameserver": [
+      "https://223.5.5.5/dns-query",
+      "https://1.12.12.12/dns-query",
+    ],
+    "direct-nameserver-follow-policy": true,
     "fallback-filter": {
       geoip: true,
       "geoip-code": "CN",

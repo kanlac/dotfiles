@@ -54,7 +54,7 @@
   - `🏠 LA-Direct`：VLESS+Reality+Vision，直连 VPS（移动数据好用，天津电信拥塞不可用）
   - `🏠 LA-CDN`：VLESS+WS+TLS，经 Cloudflare CDN（域名 `kanlac.store`，电信宽带用）
 - `~/.env` 中 `LISA_CDN_SERVER` 控制 CDN 节点连接地址（域名或优选 IP），`LISA_CDN_DOMAIN` 始终为域名（用于 SNI/Host）
-- 修改模板后需运行 `yadm bootstrap` 重新生成，然后在 Clash Verge 中重载配置
+- 修改模板后需运行 `yadm bootstrap` 重新生成；Clash Verge 最终应用/重载配置需要用户手动操作
 
 # CLAUDE.md 文件区分
 
