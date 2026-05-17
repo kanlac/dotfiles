@@ -167,22 +167,78 @@ CLASH_SCRIPT_TPL="$HOME/.config/clash-verge/Script.js.tpl"
 CLASH_SCRIPT_OUT="$HOME/Library/Application Support/io.github.clash-verge-rev.clash-verge-rev/profiles/Script.js"
 
 if [ -f "$CLASH_SCRIPT_TPL" ]; then
-    # Load .env to get CLASH_SELF_* variables
+    # Load .env to get self-hosted proxy variables
     [ -f "$HOME/.env" ] && source "$HOME/.env"
 
-    if [ -n "$LISA_LA_SERVER" ] && [ -n "$LISA_LA_UUID" ] && \
-       [ -n "$LISA_LA_PUBLIC_KEY" ] && [ -n "$LISA_LA_SHORT_ID" ]; then
+    NODE_CDN_DOMAIN="${NODE_CDN_DOMAIN:-kanlac.store}"
+    NODE_CDN_SERVER="${NODE_CDN_SERVER:-$NODE_CDN_DOMAIN}"
+
+    if [ -n "$NODE_SERVER" ] && [ -n "$NODE_UUID" ] && \
+       [ -n "$NODE_REALITY_PUBLIC_KEY" ] && [ -n "$NODE_REALITY_SHORT_ID" ]; then
         mkdir -p "$(dirname "$CLASH_SCRIPT_OUT")"
-        sed -e "s|__LISA_LA_SERVER__|$LISA_LA_SERVER|g" \
-            -e "s|__LISA_LA_UUID__|$LISA_LA_UUID|g" \
-            -e "s|__LISA_LA_PUBLIC_KEY__|$LISA_LA_PUBLIC_KEY|g" \
-            -e "s|__LISA_LA_SHORT_ID__|$LISA_LA_SHORT_ID|g" \
-            -e "s|__LISA_CDN_SERVER__|${LISA_CDN_SERVER:-kanlac.store}|g" \
-            -e "s|__LISA_CDN_DOMAIN__|${LISA_CDN_DOMAIN:-kanlac.store}|g" \
-            "$CLASH_SCRIPT_TPL" > "$CLASH_SCRIPT_OUT"
+        CLASH_SCRIPT_TMP="$(mktemp)"
+        sed -e "s|__NODE_SERVER__|$NODE_SERVER|g" \
+            -e "s|__NODE_UUID__|$NODE_UUID|g" \
+            -e "s|__NODE_REALITY_PUBLIC_KEY__|$NODE_REALITY_PUBLIC_KEY|g" \
+            -e "s|__NODE_REALITY_SHORT_ID__|$NODE_REALITY_SHORT_ID|g" \
+            -e "s|__NODE_CDN_SERVER__|$NODE_CDN_SERVER|g" \
+            -e "s|__NODE_CDN_DOMAIN__|$NODE_CDN_DOMAIN|g" \
+            "$CLASH_SCRIPT_TPL" > "$CLASH_SCRIPT_TMP"
+        cp "$CLASH_SCRIPT_TMP" "$CLASH_SCRIPT_OUT"
+
+        # Clash Verge stores each profile's active script under a generated uid.
+        # Keep the stable Script.js and the current profile's bound script in sync.
+        CLASH_PROFILES_YAML="$(dirname "$CLASH_SCRIPT_OUT")/../profiles.yaml"
+        CLASH_PROFILES_DIR="$(dirname "$CLASH_SCRIPT_OUT")"
+        CLASH_SCRIPT_TMP="$CLASH_SCRIPT_TMP" \
+        CLASH_PROFILES_YAML="$CLASH_PROFILES_YAML" \
+        CLASH_PROFILES_DIR="$CLASH_PROFILES_DIR" \
+        python3 <<'PY' || true
+import os
+import shutil
+from pathlib import Path
+
+profiles_yaml = Path(os.environ["CLASH_PROFILES_YAML"])
+profiles_dir = Path(os.environ["CLASH_PROFILES_DIR"])
+script_tmp = Path(os.environ["CLASH_SCRIPT_TMP"])
+
+if not profiles_yaml.exists():
+    raise SystemExit(0)
+
+current = None
+items = []
+item = None
+for raw in profiles_yaml.read_text().splitlines():
+    line = raw.strip()
+    if raw.startswith("current: "):
+        current = line.split(":", 1)[1].strip()
+    elif raw.startswith("- uid: "):
+        if item:
+            items.append(item)
+        item = {"uid": line.split(":", 1)[1].strip()}
+    elif item is not None:
+        if raw.startswith("  type: "):
+            item["type"] = line.split(":", 1)[1].strip()
+        elif raw.startswith("  file: "):
+            item["file"] = line.split(":", 1)[1].strip()
+        elif raw.startswith("    script: "):
+            item["option_script"] = line.split(":", 1)[1].strip()
+if item:
+    items.append(item)
+
+current_item = next((entry for entry in items if entry.get("uid") == current), None)
+script_uid = (current_item or {}).get("option_script")
+script_item = next((entry for entry in items if entry.get("uid") == script_uid), None)
+script_file = (script_item or {}).get("file")
+if script_item and script_item.get("type") == "script" and script_file:
+    target = profiles_dir / script_file
+    shutil.copyfile(script_tmp, target)
+    print(f"Clash Verge active profile script synced: {target}")
+PY
+        rm -f "$CLASH_SCRIPT_TMP"
         echo "Clash Verge Script.js generated"
     else
-        echo "Warning: LISA_LA_* variables not set in ~/.env, skipping Script.js generation"
+        echo "Warning: self-hosted proxy variables not set in ~/.env, skipping Script.js generation"
     fi
 fi
 
@@ -191,5 +247,6 @@ echo "Bootstrap complete! Restart your shell to apply changes."
 echo ""
 echo "Don't forget to:"
 echo "  1. Create ~/.env file with your sensitive environment variables"
-echo "     (LISA_LA_SERVER, LISA_LA_UUID, LISA_LA_PUBLIC_KEY, LISA_LA_SHORT_ID)"
+echo "     (NODE_SERVER, NODE_UUID, NODE_REALITY_PUBLIC_KEY, NODE_REALITY_SHORT_ID)"
+echo "     Optional: NODE_CDN_SERVER, NODE_CDN_DOMAIN"
 echo "  2. Open Neovim to let lazy.nvim install plugins: nvim"

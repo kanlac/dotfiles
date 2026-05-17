@@ -29,7 +29,6 @@
   },
   "codex": {
     "config": {
-      "notify": ["bash", "-lc", "say -v Sinji \"搞掂咗\""],
       "tui.notifications": true
     }
   }
