@@ -33,7 +33,7 @@ ssh2() {
 
     local remote_user="${1:-${USER}}"
     local remote_host="${2:-${SSH2_HOST:-kans-mac-mini}}"
-    local target status
+    local target ssh_exit
 
     if [[ "$remote_user" == *@* ]]; then
         target="$remote_user"
@@ -48,9 +48,9 @@ ssh2() {
             -o ConnectTimeout=5 \
             -o BatchMode=yes \
             "$target" 'bash -lc "tmux attach"'
-        status=$?
+        ssh_exit=$?
 
-        [[ "$status" -eq 255 ]] || return "$status"
+        [[ "$ssh_exit" -eq 255 ]] || return "$ssh_exit"
         sleep 3
     done
 }
