@@ -9,6 +9,52 @@ alias og='lazygit --git-dir=$HOME/git-repos/obsidian-vault --work-tree="$HOME/Li
 # Antigravity Manager 更新
 alias update-antigravity='~/bin/update-antigravity.sh'
 
+# Copy files or directories from the Mac mini into the current directory.
+cp2() {
+    local remote_host="${MAC_MINI_SCP_HOST:-${USER}@kans-mac-mini}"
+
+    if [ $# -eq 0 ]; then
+        echo "Usage: cp2 <remote-path> [remote-path ...]"
+        return 2
+    fi
+
+    local -a sources
+    local remote_path
+    for remote_path in "$@"; do
+        sources+=("${remote_host}:${remote_path}")
+    done
+
+    command scp -r "${sources[@]}" .
+}
+
+# Reattach to the Mac mini tmux session and silently reconnect after SSH drops.
+ssh2() {
+    emulate -L zsh
+
+    local remote_user="${1:-${USER}}"
+    local remote_host="${2:-${SSH2_HOST:-kans-mac-mini}}"
+    local target status
+
+    if [[ "$remote_user" == *@* ]]; then
+        target="$remote_user"
+    else
+        target="${remote_user}@${remote_host}"
+    fi
+
+    while true; do
+        command ssh -tt -q \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=2 \
+            -o ConnectTimeout=5 \
+            -o BatchMode=yes \
+            "$target" 'bash -lc "tmux attach"'
+        status=$?
+
+        [[ "$status" -eq 255 ]] || return "$status"
+        sleep 3
+    done
+}
+
 # tmux: 设置当前 window 的默认目录并重命名
 tz() {
     local target_dir="${1:-.}"  # 默认使用当前目录
@@ -46,4 +92,3 @@ tz() {
     echo "✓ Window renamed to: $window_name"
     echo "✓ Changed directory to: $target_dir"
 }
-
