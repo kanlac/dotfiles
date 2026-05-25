@@ -47,8 +47,15 @@ ssh2() {
             -o ServerAliveCountMax=2 \
             -o ConnectTimeout=5 \
             -o BatchMode=yes \
-            "$target" 'bash -lc "tmux attach"'
+            "$target" 'bash -lc "tmux attach"' 2>/dev/null
         ssh_exit=$?
+
+        command stty sane 2>/dev/null
+        if [[ -t 1 ]]; then
+            printf '\033[?1l\033>\033[?7h\033[?12l\033[?25h'
+            printf '\033[?1000l\033[?1002l\033[?1003l\033[?1004l\033[?1005l\033[?1006l\033[?1015l'
+            printf '\033[?2004l'
+        fi
 
         [[ "$ssh_exit" -eq 255 ]] || return "$ssh_exit"
         sleep 3
