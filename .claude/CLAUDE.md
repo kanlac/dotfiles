@@ -95,6 +95,10 @@
 - **不要用 Context7 MCP 查 Claude Code 文档**：Context7 的索引有滞后，查不到新版本的字段和功能。查 Claude Code 最新文档用 `defuddle parse "https://docs.anthropic.com/en/docs/claude-code/<page>" --md` 直接抓官网
 
 
+# NotebookLM 交互
+
+需要和 NotebookLM 交互时，优先使用已配置好的 `notebooklm-py` CLI：进入 `$HOME/Documents/Codex/2026-05-25/teng-lin-notebooklm-py-https-github` 后运行 `uv run notebooklm ...`；上游仓库是 https://github.com/teng-lin/notebooklm-py，可用于排查问题或获取更新；认证已保存在 `~/.notebooklm/profiles/default/storage_state.json`，开始前可用 `uv run notebooklm auth check --test --json` 验证，不要重新索要 Google 账号密码。
+
 # Telegram Channel 交互
 
 - 收到 Telegram 消息后，先对该消息发送一个 👀 emoji react，表示正在处理，然后再开始实际工作
