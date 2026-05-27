@@ -268,8 +268,10 @@ function applyRules(config, airport) {
     "IP-CIDR6,::1/128,DIRECT",
     "DOMAIN,localhost,DIRECT",
     "DOMAIN-SUFFIX,local,DIRECT",
+    "DOMAIN-KEYWORD,immersivetranslate,DIRECT",
 
     "PROCESS-NAME,WeChat,DIRECT",
+    `DOMAIN,mp.weixin.qq.com,${airport}`,
     `PROCESS-NAME,git-remote-http,${airport}`,
     `PROCESS-PATH-REGEX,.*/\\.local/share/claude/.*,${NODE.groupName}`,
 
@@ -281,25 +283,7 @@ function applyRules(config, airport) {
     ...AIRPORT_GEOIP_RULES.map(rule => appendPolicy(rule, airport)),
   ];
 
-  const ownedPrefixes = [
-    "IP-CIDR,127.0.0.0/8,",
-    "IP-CIDR6,::1/128,",
-    "DOMAIN,localhost,",
-    "DOMAIN-SUFFIX,local,",
-    "PROCESS-NAME,WeChat,",
-    "PROCESS-NAME,git-remote-http,",
-    "PROCESS-PATH-REGEX,.*/\\.local/share/claude/.*,",
-    ...AI_RULES.map(rule => `${rule},`),
-    ...AIRPORT_RULES.map(rule => `${rule},`),
-    "GEOIP,PRIVATE,",
-    "GEOIP,CN,",
-    ...AIRPORT_GEOIP_RULES.map(rule => `${rule},`),
-  ];
-
-  const remaining = config.rules.filter(rule =>
-    !ownedPrefixes.some(prefix => rule.startsWith(prefix))
-  );
-  config.rules = prependRule.concat(remaining);
+  config.rules = prependRule.concat(config.rules || []);
 }
 
 function main(config) {
