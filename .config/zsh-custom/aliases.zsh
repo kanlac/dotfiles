@@ -1,4 +1,3 @@
-alias cc='claude --dangerously-skip-permissions'
 alias oc='opencode'
 alias codex='codex --dangerously-bypass-approvals-and-sandbox'
 
@@ -9,7 +8,7 @@ alias og='lazygit --git-dir=$HOME/git-repos/obsidian-vault --work-tree="$HOME/Li
 # Antigravity Manager 更新
 alias update-antigravity='~/bin/update-antigravity.sh'
 
-# Copy files or directories from the Mac mini into the current directory.
+# Copy files or directories from the Mac mini into the local Downloads directory.
 cp2() {
     local remote_host="${MAC_MINI_SCP_HOST:-${USER}@kans-mac-mini}"
 
@@ -24,7 +23,7 @@ cp2() {
         sources+=("${remote_host}:${remote_path}")
     done
 
-    command scp -r "${sources[@]}" .
+    command scp -r "${sources[@]}" "$HOME/Downloads/"
 }
 
 # Reattach to the Mac mini tmux session and silently reconnect after SSH drops.
