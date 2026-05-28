@@ -1,5 +1,6 @@
 alias oc='opencode'
 alias codex='codex --dangerously-bypass-approvals-and-sandbox'
+alias h='hermes --tui'
 
 alias lg='lazygit'
 alias yg='yadm enter lazygit'
