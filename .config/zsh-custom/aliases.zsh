@@ -1,3 +1,4 @@
+alias cc='claude --allow-dangerously-skip-permissions'
 alias oc='opencode'
 alias codex='codex --dangerously-bypass-approvals-and-sandbox'
 alias h='hermes --tui'
