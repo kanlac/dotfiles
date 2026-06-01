@@ -21,6 +21,10 @@
  * - __NODE_REALITY_SHORT_ID__: Reality short id generated on the VPS.
  * - __NODE_CDN_SERVER__: CDN edge hostname or preferred CDN IP/domain.
  * - __NODE_CDN_DOMAIN__: TLS SNI and WebSocket Host for the CDN route.
+ *
+ * Note: external-controller / secret / ports are reserved by Clash Verge itself
+ * (merge_default_config) and CANNOT be set here — configure them in Clash Verge's
+ * own config.yaml. This script only controls proxies / groups / rules / dns / tun.
  */
 
 const NODE = {
@@ -269,6 +273,7 @@ function applyRules(config, airport) {
     "DOMAIN,localhost,DIRECT",
     "DOMAIN-SUFFIX,local,DIRECT",
     "DOMAIN-KEYWORD,immersivetranslate,DIRECT",
+    "DOMAIN-KEYWORD,feishu,DIRECT",
 
     "PROCESS-NAME,WeChat,DIRECT",
     `DOMAIN,mp.weixin.qq.com,${airport}`,
