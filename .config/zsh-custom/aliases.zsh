@@ -1,6 +1,6 @@
-alias cc='claude --allow-dangerously-skip-permissions'
+alias cc='claude --dangerously-skip-permissions'
 alias oc='opencode'
-alias codex='codex --dangerously-bypass-approvals-and-sandbox'
+alias codex='codex -c features.apps=false --dangerously-bypass-approvals-and-sandbox'
 alias h='hermes --tui'
 
 alias lg='lazygit'
