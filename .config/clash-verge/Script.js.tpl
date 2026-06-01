@@ -150,6 +150,7 @@ function appendPolicy(rule, policy) {
 function applyDns(config) {
   config.dns = {
     enable: true,
+    ipv6: false,
     listen: ":53",
     "enhanced-mode": "fake-ip",
     "fake-ip-range": "198.18.0.1/16",

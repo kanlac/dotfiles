@@ -13,6 +13,10 @@
 - **从历史中删文件的正确做法**：在新 commit 里 `git rm` + 加 `.gitignore`，不重写历史。如果确实需要清除敏感数据，用 `git filter-repo`（比 filter-branch 安全）
 - **重建分支后必须验证**：如果不得已做了 cherry-pick 重建，必须检查关键文件（入口文件、配置文件、CSS 入口）是否完整，跑一遍 `git diff` 确认改动数量与预期一致
 
+# GitHub 评论发布规则
+
+- 需要在 GitHub issue/PR 上发布评论、回复维护者、解释问题或补充信息时，先把拟发布内容作为草稿发给用户确认；用户明确同意后再调用 GitHub/`gh` 写入。除非用户在当前消息中明确要求“直接发/帮我回复”，否则不要代发。
+
 # Skill 优先原则
 
 - **有专门 Skill 可用时，必须优先调用 Skill，不要因为"觉得自己能搞定"就绕过**。Skill 封装了专门的流程和质量保障（如 `skill-creator:skill-creator` 用于创建 skill，`superpowers:writing-plans` 用于写计划），跳过它等于放弃专门工具的价值。即使当前上下文已经充足，Skill 的流程本身也是一层额外的质量检查。
