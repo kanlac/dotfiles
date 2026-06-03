@@ -89,6 +89,7 @@
 # 文档和代码规范
 
 - **不要在文档/代码中硬编码用户名**：Skill 文档、脚本、配置示例中使用 `$HOME`、`~`、`$USER` 等变量或占位符，不要出现具体的用户名（如 `/Users/kan/`）
+- **文档命名规范**：所有文档统一使用 `yyMMdd-` 作为前缀命名（例如 `docs/260603-user-journey.md`），以保持跨项目的时间线清晰可回溯。
 
 # macOS 通知横幅关闭
 
@@ -97,6 +98,11 @@
 # 文档查询
 
 - **不要用 Context7 MCP 查 Claude Code 文档**：Context7 的索引有滞后，查不到新版本的字段和功能。查 Claude Code 最新文档用 `defuddle parse "https://docs.anthropic.com/en/docs/claude-code/<page>" --md` 直接抓官网
+
+- **调研具体项目/仓库时：该 fetch 就别 search**（亲历：把短名 `qmd` 默认解析成最高频的 Quarto，又拿 WebSearch 二手摘要当结论）：
+  - 用户给了 URL 或点名了具体项目，**直接 WebFetch 那个 URL**，不要 WebSearch 同名词。
+  - 短名有歧义时先确认是哪个仓库（问用户 / 抓 `owner/repo`），别默选最有名的同名项目。
+  - 下"它支持/不支持 X"这种结论前，先 fetch 一手 README，不信 WebSearch 摘要。
 
 
 # NotebookLM 交互
@@ -133,3 +139,9 @@
 **兜底**：不确定的片段用行内代码 `` ` `` 包住；仍无把握就退回 `format: "text"` 发送纯文本——宁可丢格式，不要让消息发送失败。
 
 **`can't parse entities` 报错时**：立刻用 `edit_message` 或重发 `format: "text"` 纯文本让用户先看到内容，再定位漏转义字符（错误里有 offset 提示）、修好后发 MarkdownV2 版。不要反复试错。
+
+# 参考资料沉淀
+
+- **LLM-Wiki (Andrej Karpathy 提出)**: 
+  - 概念来源: [Karpathy LLM Wiki Gist](https://gist.github.com/karpathy/d4e414c12bb166cdab0eb2160cf1c0d4) (及相关社区实践)
+  - 核心思想: 放弃传统的“每次重新检索阅读生文”的 RAG 模式，转向“持续累积和编译”模式。系统维护一个结构化、互相链接的 Markdown Wiki。用户上传资料（Ingest），AI 提取事实更新 Wiki；用户提问（Query），AI 基于 Wiki 回答并更新新知识；AI 后台自动整理（Lint）。这非常适合做多品牌代运营的知识沉淀，是目前基础形态的产品方向。
