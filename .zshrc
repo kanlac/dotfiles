@@ -138,3 +138,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # claude code
 export CLAUDE_CODE_NO_FLICKER=1
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/kan/.local/bin:$PATH"
