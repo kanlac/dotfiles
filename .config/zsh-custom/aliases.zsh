@@ -10,13 +10,28 @@ alias og='lazygit --git-dir=$HOME/git-repos/obsidian-vault --work-tree="$HOME/Li
 # Antigravity Manager 更新
 alias update-antigravity='~/bin/update-antigravity.sh'
 
-# Copy files or directories from the Mac mini into the local Downloads directory.
+# Copy files or directories from the other Mac into the local Downloads directory.
 cp2() {
-    local remote_host="${MAC_MINI_SCP_HOST:-${USER}@kans-mac-mini}"
+    emulate -L zsh
+
+    local local_host remote_host
+    local_host="$(scutil --get LocalHostName 2>/dev/null || hostname -s 2>/dev/null || hostname 2>/dev/null)"
+    local_host="${local_host:l}"
 
     if [ $# -eq 0 ]; then
         echo "Usage: cp2 <remote-path> [remote-path ...]"
         return 2
+    fi
+
+    if [[ -n "${CP2_REMOTE_HOST:-}" ]]; then
+        remote_host="$CP2_REMOTE_HOST"
+    elif [[ "$local_host" == kans-mac-mini* || "$local_host" == *mac-mini* ]]; then
+        remote_host="${CP2_MACBOOK_HOST:-${USER}@kans-air-m5}"
+    elif [[ "$local_host" == kans-air-m5* || "$local_host" == kans-macbook* || "$local_host" == *macbook* ]]; then
+        remote_host="${CP2_MAC_MINI_HOST:-${MAC_MINI_SCP_HOST:-${USER}@kans-mac-mini}}"
+    else
+        echo "cp2: unknown local machine '$local_host'. Set CP2_REMOTE_HOST=user@host."
+        return 1
     fi
 
     local -a sources
