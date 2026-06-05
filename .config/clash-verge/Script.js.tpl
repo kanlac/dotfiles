@@ -94,6 +94,14 @@ const FAKE_IP_FILTER = [
   "localhost.ptlogin2.qq.com",
   "*.msftncsi.com",
   "www.msftconnecttest.com",
+  // Captive portal / 公共 WiFi 登录探测：必须拿真实 IP，
+  // 否则 fake-ip 会让门户跳转拦截失效，星巴克等登录页弹不出来。
+  "captive.apple.com",
+  "*.apple.com.akadns.net",
+  "connectivitycheck.gstatic.com",
+  "connectivitycheck.android.com",
+  "*.network-auth.com",
+  "detectportal.firefox.com",
 ];
 
 const AI_RULES = [
@@ -113,6 +121,20 @@ const AI_RULES = [
 const AIRPORT_RULES = [
   "DOMAIN-KEYWORD,reddit",
   "DOMAIN-KEYWORD,runpod",
+];
+
+// 公共 WiFi 强制门户（captive portal）探测流量一律直连，
+// 不要走代理（登录前代理不可达），让系统能弹出登录页。
+const CAPTIVE_PORTAL_RULES = [
+  "DOMAIN,captive.apple.com,DIRECT",
+  "DOMAIN-SUFFIX,captive.apple.com,DIRECT",
+  "DOMAIN,connectivitycheck.gstatic.com,DIRECT",
+  "DOMAIN-SUFFIX,connectivitycheck.gstatic.com,DIRECT",
+  "DOMAIN-SUFFIX,connectivitycheck.android.com,DIRECT",
+  "DOMAIN-SUFFIX,network-auth.com,DIRECT",
+  "DOMAIN-SUFFIX,detectportal.firefox.com,DIRECT",
+  "PROCESS-NAME,Captive Network Assistant,DIRECT",
+  "PROCESS-NAME,CaptiveNetworkAssistant,DIRECT",
 ];
 
 const AIRPORT_GEOIP_RULES = [
@@ -278,6 +300,8 @@ function applyRules(config, airport) {
     "DOMAIN-SUFFIX,ts.net,DIRECT",
     "DOMAIN-KEYWORD,immersivetranslate,DIRECT",
     "DOMAIN-KEYWORD,feishu,DIRECT",
+
+    ...CAPTIVE_PORTAL_RULES,
 
     "PROCESS-NAME,WeChat,DIRECT",
     `DOMAIN,mp.weixin.qq.com,${airport}`,
