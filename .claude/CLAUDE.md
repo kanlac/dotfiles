@@ -13,6 +13,11 @@
 - **从历史中删文件的正确做法**：在新 commit 里 `git rm` + 加 `.gitignore`，不重写历史。如果确实需要清除敏感数据，用 `git filter-repo`（比 filter-branch 安全）
 - **重建分支后必须验证**：如果不得已做了 cherry-pick 重建，必须检查关键文件（入口文件、配置文件、CSS 入口）是否完整，跑一遍 `git diff` 确认改动数量与预期一致
 
+# Git Worktree 规范
+
+- worktree 一律建在仓库根的 `.worktrees/` 目录（复数）并加入 `.gitignore`，命令 `git worktree add .worktrees/<name> -b <branch>`（path 必填，git 无默认值）。
+- Claude Code 的 `isolation: "worktree"` 默认放在 `.claude/worktrees/`，与本规范不符，需手动迁移到 `.worktrees/`。
+
 # GitHub 评论发布规则
 
 - 需要在 GitHub issue/PR 上发布评论、回复维护者、解释问题或补充信息时，先把拟发布内容作为草稿发给用户确认；用户明确同意后再调用 GitHub/`gh` 写入。除非用户在当前消息中明确要求“直接发/帮我回复”，否则不要代发。
