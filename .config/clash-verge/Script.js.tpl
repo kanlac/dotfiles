@@ -271,8 +271,11 @@ function applyRules(config, airport) {
   const prependRule = [
     "IP-CIDR,127.0.0.0/8,DIRECT",
     "IP-CIDR6,::1/128,DIRECT",
+    "IP-CIDR,100.64.0.0/10,DIRECT,no-resolve",
+    "IP-CIDR,100.100.100.100/32,DIRECT,no-resolve",
     "DOMAIN,localhost,DIRECT",
     "DOMAIN-SUFFIX,local,DIRECT",
+    "DOMAIN-SUFFIX,ts.net,DIRECT",
     "DOMAIN-KEYWORD,immersivetranslate,DIRECT",
     "DOMAIN-KEYWORD,feishu,DIRECT",
 

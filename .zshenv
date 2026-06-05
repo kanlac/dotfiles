@@ -15,7 +15,7 @@ if [[ "${PROXY:l}" == "on" ]]; then
   export HTTPS_PROXY="$http"
   export all_proxy="$socks"
   export ALL_PROXY="$socks"
-  export no_proxy="localhost,127.0.0.1,::1,.local,example.com,.example.com,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12"
+  export no_proxy="localhost,127.0.0.1,::1,.local,.ts.net,example.com,.example.com,10.0.0.0/8,100.64.0.0/10,192.168.0.0/16,172.16.0.0/12"
   export NO_PROXY="$no_proxy"
 else
   unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY no_proxy NO_PROXY
