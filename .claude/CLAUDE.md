@@ -60,6 +60,7 @@
 - 通过 `~/.env` 中的 `PROXY=on` 控制代理开关
 - `~/.zshrc` 读取 `PROXY` 变量，当值为 `on` 时 export HTTP/SOCKS5 代理环境变量（`http_proxy`, `all_proxy` 等），地址为 `127.0.0.1:7890`
 - SSH 代理（`~/.ssh/config`）通过 `ProxyCommand` 检测 `$all_proxy` 是否存在来决定是否走 SOCKS5 代理，不硬编码地址
+- 远程机器下载海外资源慢时，优先用 SSH reverse tunnel 让远端复用本地代理；必须同时验证远端 `curl -x` 能访问目标源、本地 Clash controller 能看到连接命中预期节点。若确认走代理仍慢，再切换节点测速
 - 关闭代理：在 `~/.env` 中删除或注释 `PROXY=on`，然后重启 shell
 
 # Clash Verge 自建节点
