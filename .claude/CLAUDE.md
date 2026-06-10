@@ -2,6 +2,10 @@
 
 - 使用 [yadm](https://yadm.io) 管理个人配置文件，详见 `~/README.md`
 
+# Hermes
+
+- `~/.hermes` 是 Nous Research 的开源 AI agent 平台 hermes-agent：https://github.com/NousResearch/hermes-agent
+
 # Git SSH 配置
 
 - 默认使用 `github.com`（例如 `git@github.com:user/repo.git`）
