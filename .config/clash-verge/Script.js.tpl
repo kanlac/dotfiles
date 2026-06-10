@@ -1,88 +1,14 @@
 /**
- * Self-hosted VLESS Reality + CDN fallback profile transformer.
+ * Personal Clash/Mihomo profile transformer.
  *
  * This file is the single source of truth for a Clash/Mihomo client profile.
- * It can be used directly as a Clash Verge profile script, or handed to an AI
- * or conversion tool to derive equivalent configs for other clients.
- * Keep this template public-safe: do not replace placeholders in this file.
- * Generated client files contain real node secrets and must not be committed.
- *
- * Architecture:
- * - Direct: VLESS + Reality + Vision over TCP/443.
- * - CDN: VLESS + WebSocket + TLS over a CDN hostname on TCP/443.
- * - Selection: a url-test group chooses CDN first, direct fallback second.
- * - DNS: fake-ip, DNS hijack, and rule-respecting DoH to reduce DNS leaks.
- * - TUN: enabled with any:53 hijack so system DNS packets enter Mihomo.
- *
- * Required placeholders:
- * - __NODE_SERVER__: public IP or hostname of the VPS for Reality direct.
- * - __NODE_UUID__: VLESS client UUID.
- * - __NODE_REALITY_PUBLIC_KEY__: Reality public key generated on the VPS.
- * - __NODE_REALITY_SHORT_ID__: Reality short id generated on the VPS.
- * - __NODE_CDN_SERVER__: CDN edge hostname or preferred CDN IP/domain.
- * - __NODE_CDN_DOMAIN__: TLS SNI and WebSocket Host for the CDN route.
+ * It can be used directly as a Clash Verge profile script. Keep it
+ * public-safe: self-hosted nodes should live in remote subscriptions, not here.
  *
  * Note: external-controller / secret / ports are reserved by Clash Verge itself
  * (merge_default_config) and CANNOT be set here — configure them in Clash Verge's
  * own config.yaml. This script only controls proxies / groups / rules / dns / tun.
  */
-
-const NODE = {
-  directName: "🏠 LA-Direct",
-  cdnName: "🏠 LA-CDN",
-  groupName: "🏠 LA",
-  directServer: "__NODE_SERVER__",
-  cdnServer: "__NODE_CDN_SERVER__",
-  cdnDomain: "__NODE_CDN_DOMAIN__",
-  uuid: "__NODE_UUID__",
-  realityPublicKey: "__NODE_REALITY_PUBLIC_KEY__",
-  realityShortId: "__NODE_REALITY_SHORT_ID__",
-  realityServerName: "www.microsoft.com",
-  wsPath: "/ws",
-};
-
-const DIRECT_NODE = {
-  name: NODE.directName,
-  type: "vless",
-  server: NODE.directServer,
-  port: 443,
-  uuid: NODE.uuid,
-  network: "tcp",
-  tls: true,
-  udp: true,
-  flow: "xtls-rprx-vision",
-  "client-fingerprint": "chrome",
-  servername: NODE.realityServerName,
-  "reality-opts": {
-    "public-key": NODE.realityPublicKey,
-    "short-id": NODE.realityShortId,
-  },
-};
-
-const CDN_NODE = {
-  name: NODE.cdnName,
-  type: "vless",
-  server: NODE.cdnServer,
-  port: 443,
-  uuid: NODE.uuid,
-  network: "ws",
-  tls: true,
-  udp: false,
-  servername: NODE.cdnDomain,
-  "ws-opts": {
-    path: NODE.wsPath,
-    headers: { Host: NODE.cdnDomain },
-  },
-};
-
-const NODE_GROUP = {
-  name: NODE.groupName,
-  type: "url-test",
-  proxies: [NODE.cdnName, NODE.directName],
-  url: "https://www.gstatic.com/generate_204",
-  interval: 300,
-  tolerance: 50,
-};
 
 const FAKE_IP_FILTER = [
   "*.lan",
@@ -151,17 +77,12 @@ const AIRPORT_GEOIP_RULES = [
   "GEOIP,HK",
 ];
 
-function removeByName(items, names) {
-  const blocked = new Set(names);
-  return (items || []).filter(item => !blocked.has(item.name));
-}
-
 function findAirportGroup(config) {
   const groups = config["proxy-groups"] || [];
-  const selfNames = new Set([NODE.groupName, NODE.directName, NODE.cdnName]);
-  const selectGroup = groups.find(group =>
-    group.type === "select" && !selfNames.has(group.name)
-  );
+  const proxyGroup = groups.find(group => group.name === "PROXY" && group.type === "select");
+  if (proxyGroup) return proxyGroup.name;
+
+  const selectGroup = groups.find(group => group.type === "select");
   return selectGroup && selectGroup.name;
 }
 
@@ -245,7 +166,7 @@ function applySniffer(config) {
     enable: true,
     sniff: {
       TLS: {
-        ports: [443, 8443],
+        ports: [443, 8443, 2096],
         "override-destination": true,
       },
       HTTP: {
@@ -258,29 +179,6 @@ function applySniffer(config) {
       "dlg.io.mi.com",
     ],
   };
-}
-
-function applyNodes(config) {
-  config.proxies = removeByName(config.proxies, [NODE.directName, NODE.cdnName]);
-  config.proxies.unshift(DIRECT_NODE, CDN_NODE);
-}
-
-function applyGroups(config) {
-  config["proxy-groups"] = removeByName(config["proxy-groups"], [NODE.groupName]);
-  config["proxy-groups"].unshift(NODE_GROUP);
-
-  const airport = findAirportGroup(config);
-  if (!airport) return null;
-
-  const airportGroup = config["proxy-groups"].find(group => group.name === airport);
-  if (airportGroup) {
-    const existing = (airportGroup.proxies || []).filter(name =>
-      ![NODE.groupName, NODE.directName, NODE.cdnName].includes(name)
-    );
-    airportGroup.proxies = [NODE.groupName, NODE.directName, NODE.cdnName, ...existing];
-  }
-
-  return airport;
 }
 
 function applyRules(config, airport) {
@@ -306,9 +204,9 @@ function applyRules(config, airport) {
     "PROCESS-NAME,WeChat,DIRECT",
     `DOMAIN,mp.weixin.qq.com,${airport}`,
     `PROCESS-NAME,git-remote-http,${airport}`,
-    `PROCESS-PATH-REGEX,.*/\\.local/share/claude/.*,${NODE.groupName}`,
+    `PROCESS-PATH-REGEX,.*/\\.local/share/claude/.*,${airport}`,
 
-    ...AI_RULES.map(rule => appendPolicy(rule, NODE.groupName)),
+    ...AI_RULES.map(rule => appendPolicy(rule, airport)),
     ...AIRPORT_RULES.map(rule => appendPolicy(rule, airport)),
 
     "GEOIP,PRIVATE,DIRECT",
@@ -323,8 +221,7 @@ function main(config) {
   applyDns(config);
   applyTun(config);
   applySniffer(config);
-  applyNodes(config);
-  const airport = applyGroups(config);
+  const airport = findAirportGroup(config);
   applyRules(config, airport);
   return config;
 }
