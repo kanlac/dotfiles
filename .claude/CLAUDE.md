@@ -157,6 +157,13 @@
 
 **`can't parse entities` 报错时**：立刻用 `edit_message` 或重发 `format: "text"` 纯文本让用户先看到内容，再定位漏转义字符（错误里有 offset 提示）、修好后发 MarkdownV2 版。不要反复试错。
 
+# Obsidian 库
+
+- 路径：`~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obsidian/`
+- 通过 iCloud 跨设备同步，私密文档（基础设施 SOP、账号信息等）放这里而非 memory 或公开仓库
+- 文档放 `docs/` 子目录
+- 文件名即标题，文档内部不写一级标题（`# 标题`）
+
 # 参考资料沉淀
 
 - **LLM-Wiki (Andrej Karpathy 提出)**: 
