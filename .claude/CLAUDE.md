@@ -19,8 +19,8 @@
 
 # Git Worktree 规范
 
-- worktree 一律建在仓库根的 `.worktrees/` 目录（复数）并加入 `.gitignore`，命令 `git worktree add .worktrees/<name> -b <branch>`（path 必填，git 无默认值）。
-- Claude Code 的 `isolation: "worktree"` 默认放在 `.claude/worktrees/`，与本规范不符，需手动迁移到 `.worktrees/`。
+- worktree 建在仓库的同级目录，命名为 `<repo>-<name>`，命令 `git worktree add ../<repo>-<name> -b <branch>`（path 必填，git 无默认值）。例如仓库 `~/Documents/lawyer`，worktree 路径为 `~/Documents/lawyer-ocr-clean`。
+- Claude Code 的 `isolation: "worktree"` 默认放在 `.claude/worktrees/`，与本规范不符；如需手动创建 worktree，按上述同级目录规范执行。
 
 # GitHub 评论发布规则
 
@@ -35,6 +35,7 @@
 # Skill 优先原则
 
 - **有专门 Skill 可用时，必须优先调用 Skill，不要因为"觉得自己能搞定"就绕过**。Skill 封装了专门的流程和质量保障（如 `skill-creator:skill-creator` 用于创建 skill，`superpowers:writing-plans` 用于写计划），跳过它等于放弃专门工具的价值。即使当前上下文已经充足，Skill 的流程本身也是一层额外的质量检查。
+- **默认语义：用户提“改 skill”=改项目源码**。在本会话语境中，默认指向 `~/Documents/agent-steroids`（或其对应工作树）里的源文件，不是 `~/.codex/plugins/cache/...` 中的副本。
 
 # Skill 编写规则
 

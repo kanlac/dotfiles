@@ -28,6 +28,8 @@ const FAKE_IP_FILTER = [
   "connectivitycheck.android.com",
   "*.network-auth.com",
   "detectportal.firefox.com",
+  "*.kanlac.store",
+  "kanlac.store",
 ];
 
 const AI_RULES = [
@@ -63,6 +65,10 @@ const CAPTIVE_PORTAL_RULES = [
   "PROCESS-NAME,CaptiveNetworkAssistant,DIRECT",
 ];
 
+const AIRPORT_CONTROL_RULES = [
+  "DOMAIN-SUFFIX,kanlac.store,DIRECT",
+];
+
 const AIRPORT_GEOIP_RULES = [
   "GEOIP,US",
   "GEOIP,JP",
@@ -88,6 +94,22 @@ function findAirportGroup(config) {
 
 function appendPolicy(rule, policy) {
   return `${rule},${policy}`;
+}
+
+function isIpLiteral(server) {
+  return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(server);
+}
+
+function routeExcludeAddresses(config) {
+  const addresses = new Set(config.tun?.["route-exclude-address"] || []);
+
+  for (const proxy of config.proxies || []) {
+    if (isIpLiteral(proxy.server)) {
+      addresses.add(`${proxy.server}/32`);
+    }
+  }
+
+  return [...addresses].sort();
 }
 
 function applyDns(config) {
@@ -156,6 +178,7 @@ function applyTun(config) {
     "auto-route": true,
     "auto-detect-interface": true,
     "dns-hijack": ["any:53"],
+    "route-exclude-address": routeExcludeAddresses(config),
     mtu: 1500,
     "strict-route": false,
   };
@@ -200,6 +223,7 @@ function applyRules(config, airport) {
     "DOMAIN-KEYWORD,feishu,DIRECT",
 
     ...CAPTIVE_PORTAL_RULES,
+    ...AIRPORT_CONTROL_RULES,
 
     "PROCESS-NAME,WeChat,DIRECT",
     `DOMAIN,mp.weixin.qq.com,${airport}`,
