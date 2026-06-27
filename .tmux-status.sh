@@ -1,7 +1,8 @@
 #!/bin/zsh
 
 # CPU
-cpu=$(top -l 1 -n 0 | awk '/CPU usage/ {printf "%.0f%%", 100 - $7}')
+logical=$(sysctl -n hw.logicalcpu)
+cpu=$(ps -A -o %cpu= | awk -v n="$logical" '{s+=$1} END {printf "%.0f%%", s/n}')
 
 # Memory
 total_bytes=$(sysctl -n hw.memsize)
