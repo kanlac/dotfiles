@@ -68,6 +68,14 @@
 - 远程机器下载海外资源慢时，优先用 SSH reverse tunnel 让远端复用本地代理；必须同时验证远端 `curl -x` 能访问目标源、本地 Clash controller 能看到连接命中预期节点。若确认走代理仍慢，再切换节点测速
 - 关闭代理：在 `~/.env` 中删除或注释 `PROXY=on`，然后重启 shell
 
+## 代理对大块 git over HTTPS 传输会截断（重要）
+
+- **现象**：`brew`（尤其 `brew update` 的 tap git fetch）、大体积 `git fetch` / `git ls-remote https://github.com/...` 走 Clash 代理时会卡住几十秒后失败，典型报错 `RPC failed; curl 18 transfer closed with outstanding read data remaining`。节点对大块 git-over-HTTPS 传输会截断。诊断实测：`git ls-remote homebrew-core` 走代理 40s 超时截断，直连 27s 成功。
+- **不是"没用上代理"**：代理是用上了，是节点扛不住大 git 传输。bottle/普通 HTTPS 小请求（ghcr.io 等）走代理是快的（~3s），不受影响。
+- **修复**：
+  - `brew`：用 `HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade <pkg>` 跳过最慢的 tap git fetch；bottle 下载照常走代理。
+  - 一般 git：优先用 SSH 远程（`git@github.com:...`，SSH 走代理 OK，push/fetch 都正常）而非 HTTPS；或对该次操作临时 `env -u http_proxy -u https_proxy -u all_proxy ...` 直连（国内直连 GitHub 有时反而比这个节点稳）。
+
 # Clash Verge 自建节点
 
 - 模板：`~/.config/clash-verge/Script.js.tpl`，通过 `yadm bootstrap` 用 `~/.env` 变量替换占位符生成 `Script.js`
@@ -97,11 +105,25 @@
 - 项目路径：`/Users/kan/Documents/agent-steroids`
 - Skill 放在 `skills/` 子目录，Command 放在 `commands/` 子目录
 
+# 法律 LLM-Wiki 仓库（lawyer-*）
+
+法律案件知识编译系统，多仓库协作，均在 `~/Documents/` 下：
+- `lawyer-shared`：共享的 law-wiki 插件/skill（编译方法论）+ prod-profile，跨案件复用
+- `lawyer-dev`：系统配置（SPEC.yaml、governor、schema、文书模板），主开发仓
+- `lawyer-case-qianshou`：单个案件的 Wiki vault（raw 材料 + 编译出的 wiki/）
+- `lawyer-wls-ingest`：材料导入/拆分 pipeline（doc-split、SCHEMA.md）
+
 # 计划文档编写规则
 
 - **闭环**：计划必须从开始执行到最终验证形成完整闭环。不能停在"更新完配置"就结束——必须包含端到端测试、数据校验等步骤，确保改动真正生效
 - **每个 Phase 有验证**：每个阶段结束时必须有可执行的验证步骤（命令、脚本、SQL 查询），不能只写"检查是否正确"
 - **标注人工确认节点**：需要用户决策的节点用醒目标记（如 🔵），并明确说明需要用户确认什么。其余 Phase 默认自主执行，尽量减少用户介入
+
+# 全局一致性（品位要求）
+
+- **改了一处，就要保证全局一致**：一旦决定修改某个标准、字段、命名、设计或事实陈述，必须主动扫描整个仓库，把所有受影响、明显不一致的地方一并改成最新标准，不要只改触发点而留下散落的旧表述（例如：把交互组件改成静态后，文档里"可交互/点选"的描述也要同步改）。
+- **自主修，不要过问**：发现这种明显的不一致时，直接按最新标准统一，不需要先征求确认。这是基本的品位要求——半途而废的、自相矛盾的产出比不改更糟。
+- **边界**：仅适用于"已经决定的改动所引发的明显不一致"。对仍未拍板的开放决策（如待定的报价口径、两套并存的方案），不要自行统一，先呈现给用户。
 
 # 文档和代码规范
 
@@ -164,6 +186,7 @@
 - 通过 iCloud 跨设备同步，私密文档（基础设施 SOP、账号信息等）放这里而非 memory 或公开仓库
 - 文档放 `docs/` 子目录
 - 文件名即标题，文档内部不写一级标题（`# 标题`）
+- 已发布/待发布的文章通过 `writing.base` 追踪（frontmatter `writing: true` 的笔记）
 
 # 参考资料沉淀
 
