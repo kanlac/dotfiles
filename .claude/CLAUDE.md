@@ -2,6 +2,10 @@
 
 - 使用 [yadm](https://yadm.io) 管理个人配置文件，详见 `~/README.md`
 
+# Tailscale 内网
+
+- 可通过 Tailscale 用主机名 `kans-mac-mini` SSH 连到 Mac mini（例如 `ssh kans-mac-mini`），无需公网 IP
+
 # Hermes
 
 - `~/.hermes` 是 Nous Research 的开源 AI agent 平台 hermes-agent：https://github.com/NousResearch/hermes-agent
@@ -89,15 +93,7 @@
 
 - **用户 CLAUDE.md**（`~/.claude/CLAUDE.md`）：全局指令，跨所有项目生效。用户说「更新用户 CLAUDE.md」指的是这个文件
 - **项目 CLAUDE.md**（项目根目录 `CLAUDE.md`）：项目专属指令。用户说「更新项目 CLAUDE.md」或未特别指定时，根据内容性质判断归属
-- 严格区分：全局通用的知识（如 Skill 编写规则、代理配置、Teammate vs Subagent）放用户 CLAUDE.md；项目专属的知识（如数据库 schema、任务编排、行业配置）放项目 CLAUDE.md
-
-# Teammate vs Subagent
-
-严格区分这两个概念，用户说哪个就用哪个：
-
-- **Teammate**（用户说「启动 teammate」「用 teammate」）：通过 `TeamCreate` 创建 team → `TaskCreate` 建任务 → `Agent` tool 带 `team_name` + `name` 参数 spawn。Teammate 是独立的 Claude Code 实例，用户可直接交互（Shift+Down 切换），teammate 之间可互相通信，通过共享 task list 协调
-- **Subagent**（用户说「用 subagent」）：通过 `Agent` tool 不带 `team_name` spawn。在主会话内运行，结果只返回给主 agent，用户无法直接交互
-- 用户说「teammate」时绝不能用 subagent 代替，反之亦然
+- 严格区分：全局通用的知识（如 Skill 编写规则、代理配置）放用户 CLAUDE.md；项目专属的知识（如数据库 schema、任务编排、行业配置）放项目 CLAUDE.md
 
 # Agent Steroids 项目
 
@@ -184,9 +180,22 @@
 
 - 路径：`~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obsidian/`
 - 通过 iCloud 跨设备同步，私密文档（基础设施 SOP、账号信息等）放这里而非 memory 或公开仓库
-- 文档放 `docs/` 子目录
+- 一般文档放 `docs/` 子目录，用 `yyMMdd-` 前缀命名
 - 文件名即标题，文档内部不写一级标题（`# 标题`）
-- 已发布/待发布的文章通过 `writing.base` 追踪（frontmatter `writing: true` 的笔记）
+
+## 写作库（写作 Writing.base）
+
+- 已发布/待发布的文章通过仓库根目录的 `写作 Writing.base` 追踪，base 过滤条件是 frontmatter `writing == true`
+- **写作笔记直接放仓库根目录**（不放 `docs/` 等子目录），**文件名即标题、不加 `yyMMdd-` 前缀**（区别于一般文档）
+- 必备 frontmatter 字段（缺 `writing: true` 不会进 base）：
+  ```yaml
+  writing: true
+  publish-date: YYYY-MM-DD
+  大标题: <通常同文件名>
+  小标题: <副标题>
+  post_tags: "#标签1 #标签2"   # 一个带引号的字符串，标签用空格分隔
+  ```
+- 正文同样不写一级标题；新建后会自动出现在 base 的 Table 视图（按 `publish-date` 倒序）
 
 # 参考资料沉淀
 
