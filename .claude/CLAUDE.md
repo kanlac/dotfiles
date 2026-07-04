@@ -1,55 +1,47 @@
 # Dotfiles 管理
-
 - 使用 [yadm](https://yadm.io) 管理个人配置文件，详见 `~/README.md`
 
 # Tailscale 内网
-
 - 可通过 Tailscale 用主机名 `kans-mac-mini` SSH 连到 Mac mini（例如 `ssh kans-mac-mini`），无需公网 IP
 
 # Hermes
-
 - `~/.hermes` 是 Nous Research 的开源 AI agent 平台 hermes-agent：https://github.com/NousResearch/hermes-agent
 
-# Git SSH 配置
+# 飞书 / Lark CLI
+- 处理飞书 / Lark / Feishu 相关任务时，优先使用 `lark-cli`；执行具体操作前，先用 `lark-cli skills list` 判断领域，再用 `lark-cli skills read <skill-name>` 读取官方 skill 文档，不要凭记忆直接调用命令。常见入口：认证/权限读 `lark-shared`，文档读写读 `lark-doc`，云盘文件读 `lark-drive`，消息读 `lark-im`，日历读 `lark-calendar`；官方仓库：https://github.com/larksuite/cli
 
+# Git SSH 配置
 - 默认使用 `github.com`（例如 `git@github.com:user/repo.git`）
 - mindfit 项目使用 `mindfitgit` 作为 git SSH host
 
 # Git 历史重写禁令
-
 - **不要用 `git filter-branch`**：它会重写整棵 commit 树的 hash，导致分支与 master 断开共同祖先，GitHub 上无法正常 diff/PR。cherry-pick 重建分支时极易丢失文件（亲历：base.css 和 main.js 改动丢失，全站样式崩溃）
 - **从历史中删文件的正确做法**：在新 commit 里 `git rm` + 加 `.gitignore`，不重写历史。如果确实需要清除敏感数据，用 `git filter-repo`（比 filter-branch 安全）
 - **重建分支后必须验证**：如果不得已做了 cherry-pick 重建，必须检查关键文件（入口文件、配置文件、CSS 入口）是否完整，跑一遍 `git diff` 确认改动数量与预期一致
 
 # Git Worktree 规范
-
 - worktree 建在仓库的同级目录，命名为 `<repo>-<name>`，命令 `git worktree add ../<repo>-<name> -b <branch>`（path 必填，git 无默认值）。例如仓库 `~/Documents/lawyer`，worktree 路径为 `~/Documents/lawyer-ocr-clean`。
 - Claude Code 的 `isolation: "worktree"` 默认放在 `.claude/worktrees/`，与本规范不符；如需手动创建 worktree，按上述同级目录规范执行。
 
 # GitHub 评论发布规则
-
 - 需要在 GitHub issue/PR 上发布评论、回复维护者、解释问题或补充信息时，先把拟发布内容作为草稿发给用户确认；用户明确同意后再调用 GitHub/`gh` 写入。除非用户在当前消息中明确要求“直接发/帮我回复”，否则不要代发。
 
 # 解压含中文文件名的 zip
-
 - **不要用系统 `unzip` 或命令行 `ditto`**：它们按 cp437 / Mac Roman 瞎解中文名，得到一堆乱码（GUI Archive Utility 反而正常，因为它会读 0x7075）
 - **正确做法**：用 Python `zipfile` 解，并**优先读每个条目的 `0x7075`（Info-ZIP Unicode Path）扩展字段**取真实 UTF-8 名，无该字段再按 GBK 转码兜底；同时跳过 `__MACOSX`、防 zip-slip
 - **损坏/截断的 zip**：先诊断（查末尾有无 EOCD `PK\x05\x06`、最后一个本地头 `PK\x03\x04` 位置、尾部是否全零）。若数据被截断（尾部大段零填充），任何工具都救不回缺失部分，只能用 `zip -FF in --out out` 重建中央目录抢救已有数据——别误判为"索引损坏可完整修复"
 
 # Skill 优先原则
-
 - **有专门 Skill 可用时，必须优先调用 Skill，不要因为"觉得自己能搞定"就绕过**。Skill 封装了专门的流程和质量保障（如 `skill-creator:skill-creator` 用于创建 skill，`superpowers:writing-plans` 用于写计划），跳过它等于放弃专门工具的价值。即使当前上下文已经充足，Skill 的流程本身也是一层额外的质量检查。
 - **默认语义：用户提“改 skill”=改项目源码**。在本会话语境中，默认指向 `~/Documents/agent-steroids`（或其对应工作树）里的源文件，不是 `~/.codex/plugins/cache/...` 中的副本。
 
 # Skill 编写规则
-
 - **Skill 不能有外部依赖**：Skill 文档（SKILL.md 及其引用的子文档）中不能引用 Skill 目录外的文件路径（如 `docs/`、`data/`、`sql/` 等）。Skill 是自包含的方法论，不依赖项目中的具体文件。如果需要提示"参考已有样本"，用搜索指引（如"在项目中搜索 xxx"）代替硬编码路径。
 - **Skill 写方向不写步骤**：方法论文档重点说明**意图和方向**（为什么要这么做、典型模板有哪些），而非详细的操作步骤。用 2-3 个典型示例启发 agent 理解目标，而不是写 step-by-step 教程。Agent 是有判断力的，给方向比给步骤更有效。
 - **Skill 要写成通用的**：不要引用个人特有的工具链或配置（如 `agents.json`、`yadm bootstrap`、特定 tmux session 名），而是用通用描述。Skill 面向所有用户，不是只给自己用的备忘录。
 - **SKILL.md 和 CLAUDE.md 不超过 200 行**：超过则指令被稀释。精炼表述，详细流程拆到 `references/` 且必须被主文档引用。
 
 # Chrome 浏览器自动化（强制规则）
-
 **凡是需要有头（GUI）Chrome 的场景，必须先 invoke `steroids:cdp-chrome` Skill，然后严格遵循其规则。**
 
 适用场景（不限于）：
@@ -65,7 +57,6 @@
 **禁止自行启动 Chrome 实例。** 所有 agent 共用一个干净的共享 Chrome（`~/.config/cdp-chrome/`），通过 `mcp__cdp-chrome__*` 工具或直连 CDP API 操作。
 
 # 代理配置
-
 - 通过 `~/.env` 中的 `PROXY=on` 控制代理开关
 - `~/.zshrc` 读取 `PROXY` 变量，当值为 `on` 时 export HTTP/SOCKS5 代理环境变量（`http_proxy`, `all_proxy` 等），地址为 `127.0.0.1:7890`
 - SSH 代理（`~/.ssh/config`）通过 `ProxyCommand` 检测 `$all_proxy` 是否存在来决定是否走 SOCKS5 代理，不硬编码地址
@@ -73,7 +64,6 @@
 - 关闭代理：在 `~/.env` 中删除或注释 `PROXY=on`，然后重启 shell
 
 ## 代理对大块 git over HTTPS 传输会截断
-
 - **现象**：`brew`（尤其 `brew update` 的 tap git fetch）、大体积 `git fetch` / `git ls-remote https://github.com/...` 走 Clash 代理时会卡住几十秒后失败，典型报错 `RPC failed; curl 18 transfer closed with outstanding read data remaining`。节点对大块 git-over-HTTPS 传输会截断。诊断实测：`git ls-remote homebrew-core` 走代理 40s 超时截断，直连 27s 成功。
 - **不是"没用上代理"**：代理是用上了，是节点扛不住大 git 传输。bottle/普通 HTTPS 小请求（ghcr.io 等）走代理是快的（~3s），不受影响。
 - **修复**：
@@ -81,7 +71,6 @@
   - 一般 git：优先用 SSH 远程（`git@github.com:...`，SSH 走代理 OK，push/fetch 都正常）而非 HTTPS；或对该次操作临时 `env -u http_proxy -u https_proxy -u all_proxy ...` 直连（国内直连 GitHub 有时反而比这个节点稳）。
 
 # Clash Verge 自建节点
-
 - 模板：`~/.config/clash-verge/Script.js.tpl`，通过 `yadm bootstrap` 用 `~/.env` 变量替换占位符生成 `Script.js`
 - 两个节点通过 `url-test` 组 `🏠 LA` 自动选延迟最低的：
   - `🏠 LA-Direct`：VLESS+Reality+Vision，直连 VPS（移动数据好用，天津电信拥塞不可用）
@@ -145,7 +134,6 @@
   - 用户给了 URL 或点名了具体项目，**直接 WebFetch 那个 URL**，不要 WebSearch 同名词。
   - 短名有歧义时先确认是哪个仓库（问用户 / 抓 `owner/repo`），别默选最有名的同名项目。
   - 下"它支持/不支持 X"这种结论前，先 fetch 一手 README，不信 WebSearch 摘要。
-
 
 # NotebookLM 交互
 
