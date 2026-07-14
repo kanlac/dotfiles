@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>PayloadDisplayName</key>
+            <string>Chrome WebRTC IP handling</string>
+            <key>PayloadIdentifier</key>
+            <string>io.yadm.chrome.webrtc.policy</string>
+            <key>PayloadType</key>
+            <string>com.google.Chrome</string>
+            <key>PayloadUUID</key>
+            <string>65E29FA6-11EF-4D43-8DF9-240F15D6F77C</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>WebRtcIPHandling</key>
+            <string>disable_non_proxied_udp</string>
+            <key>DnsOverHttpsMode</key>
+            <string>off</string>
+        </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>Prevents non-proxied WebRTC UDP and routes Chrome DNS through the system resolver on every profile, including Incognito.</string>
+    <key>PayloadDisplayName</key>
+    <string>Chrome WebRTC Fail-Closed Policy</string>
+    <key>PayloadIdentifier</key>
+    <string>io.yadm.chrome.webrtc</string>
+    <key>PayloadOrganization</key>
+    <string>Local yadm configuration</string>
+    <key>PayloadRemovalDisallowed</key>
+    <false/>
+    <key>PayloadScope</key>
+    <string>User</string>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>C1E8471B-DB6C-4A05-B8EB-00309FBB88A8</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+</dict>
+</plist>

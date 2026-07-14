@@ -58,6 +58,8 @@ yadm bootstrap
   - zsh-syntax-highlighting 插件
 - Coding Agents（Claude Code、OpenCode 的 MCP servers 和插件）
 
+在 macOS 上，bootstrap 还会检查 Chrome 网络 fail-closed 配置描述文件是否已安装。首次设置需要在“系统设置 → 通用 → 设备管理”中人工批准一次；验收以 `chrome://policy` 同时显示 `WebRtcIPHandling=disable_non_proxied_udp` 和 `DnsOverHttpsMode=off` 为准。
+
 ### 4. 创建环境变量文件
 
 ⚠️ **重要**：`~/.env` 文件包含敏感信息，不会被同步到 Git。需要手动创建：
@@ -101,7 +103,12 @@ source ~/.zshrc
 ├── .config/
 │   ├── yadm/
 │   │   ├── bootstrap               # 自动安装脚本
+│   │   ├── scripts/render-clash-verge # 单独渲染 Clash Verge 全局脚本
 │   │   └── ignore                  # yadm gitignore 规则
+│   ├── clash-verge/
+│   │   └── Script.js.tpl           # 公开模板；节点来自 Git 忽略的私密 JSON
+│   ├── chrome/
+│   │   └── WebRTCPolicy.mobileconfig # Chrome 全 profile / 无痕 WebRTC policy
 │   ├── agents.json                 # Coding Agents 统一配置源
 │   ├── nvim/
 │   │   ├── init.lua                # Neovim 配置

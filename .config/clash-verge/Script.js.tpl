@@ -10,6 +10,22 @@
  * own config.yaml. This script only controls proxies / groups / rules / dns / tun.
  */
 
+const AI_EGRESS = {
+  groupName: "🤖 AI-EGRESS",
+};
+
+// Rendered from an ignored, mode-0600 local inventory. Never put real proxy
+// credentials in this public template.
+const AI_EGRESS_PRIVATE = __AI_EGRESS_PRIVATE__;
+const AI_EGRESS_PROXIES = [
+  ...AI_EGRESS_PRIVATE.proxies.filter(
+    proxy => proxy.name === AI_EGRESS_PRIVATE.primary
+  ),
+  ...AI_EGRESS_PRIVATE.proxies.filter(
+    proxy => proxy.name !== AI_EGRESS_PRIVATE.primary
+  ),
+];
+
 const FAKE_IP_FILTER = [
   "*.lan",
   "*.local",
@@ -33,17 +49,104 @@ const FAKE_IP_FILTER = [
 ];
 
 const AI_RULES = [
+  // Process rules are the fail-safe for new or shared vendor domains.
+  "PROCESS-NAME,claude",
+  "PROCESS-NAME,Claude",
+  "PROCESS-NAME,codex",
+  "PROCESS-NAME,codex-code-mode-host",
+  "PROCESS-NAME,ChatGPT",
+  "PROCESS-PATH-REGEX,.*/(@anthropic-ai/claude-code|@openai/codex|\\.local/share/claude|\\.codex)/.*",
+
+  // Anthropic / Claude.
   "DOMAIN-KEYWORD,claude",
+  "DOMAIN-KEYWORD,anthropic",
   "DOMAIN-SUFFIX,anthropic.com",
+  "DOMAIN-SUFFIX,claude.ai",
+  "DOMAIN-SUFFIX,claude.com",
+
+  // OpenAI / ChatGPT / Codex core and product domains.
   "DOMAIN-KEYWORD,openai",
+  "DOMAIN-KEYWORD,chatgpt",
+  "DOMAIN-KEYWORD,codex",
   "DOMAIN-SUFFIX,openai.com",
   "DOMAIN-SUFFIX,chatgpt.com",
   "DOMAIN-SUFFIX,chat.com",
+  "DOMAIN-SUFFIX,ai.com",
+  "DOMAIN-SUFFIX,sora.com",
   "DOMAIN-SUFFIX,oaiusercontent.com",
   "DOMAIN-SUFFIX,oaistatic.com",
-  "DOMAIN-KEYWORD,codex",
+  "DOMAIN-SUFFIX,auth.openai.com",
+  "DOMAIN-SUFFIX,openaimerge.com",
+  "DOMAIN-SUFFIX,prodregistryv2.org",
+  "DOMAIN,chat.openai.com.cdn.cloudflare.net",
+  "DOMAIN,openai-api.arkoselabs.com",
+  "DOMAIN,openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net",
+  "DOMAIN,openaicomproductionae4b.blob.core.windows.net",
+  "DOMAIN,production-openaicom-storage.azureedge.net",
+  "DOMAIN-SUFFIX,openaiapi-site.azureedge.net",
+  "DOMAIN-SUFFIX,openaicom.imgix.net",
+
+  // OpenAI auth, risk control, feature flags, telemetry, files and realtime.
   "DOMAIN-SUFFIX,statsig.com",
   "DOMAIN-SUFFIX,statsigapi.net",
+  "DOMAIN-SUFFIX,featuregates.org",
+  "DOMAIN-SUFFIX,featureassets.org",
+  "DOMAIN-SUFFIX,arkoselabs.com",
+  "DOMAIN-SUFFIX,auth0.com",
+  "DOMAIN-SUFFIX,livekit.cloud",
+  "DOMAIN-SUFFIX,workos.com",
+  "DOMAIN-SUFFIX,workoscdn.com",
+  "DOMAIN-SUFFIX,intercom.io",
+  "DOMAIN-SUFFIX,intercomcdn.com",
+  "DOMAIN-SUFFIX,launchdarkly.com",
+  "DOMAIN-SUFFIX,algolia.net",
+  "DOMAIN-SUFFIX,segment.io",
+  "DOMAIN-SUFFIX,sentry.io",
+  "DOMAIN-SUFFIX,observeit.net",
+  "DOMAIN-SUFFIX,identrust.com",
+  "DOMAIN-SUFFIX,sendgrid.net",
+  "DOMAIN,rum.browser-intake-datadoghq.com",
+  "DOMAIN,browser-intake-datadoghq.com",
+  "DOMAIN,static.cloudflareinsights.com",
+  "DOMAIN-SUFFIX,challenges.cloudflare.com",
+  "DOMAIN,cdn.usefathom.com",
+  "DOMAIN,js.stripe.com",
+  "DOMAIN,humb.apple.com",
+  "IP-CIDR,24.199.123.28/32,no-resolve",
+  "IP-CIDR,64.23.132.171/32,no-resolve",
+
+  // Other major AI services from the BosLife / Nexitally AI groups.
+  "DOMAIN-KEYWORD,gemini",
+  "DOMAIN-KEYWORD,generativeai",
+  "DOMAIN-KEYWORD,perplexity",
+  "DOMAIN-KEYWORD,colab",
+  "DOMAIN-KEYWORD,developerprofiles",
+  "DOMAIN-SUFFIX,perplexity.ai",
+  "DOMAIN-SUFFIX,pplx.ai",
+  "DOMAIN-SUFFIX,bard.google.com",
+  "DOMAIN-SUFFIX,deepmind.com",
+  "DOMAIN-SUFFIX,deepmind.google",
+  "DOMAIN-SUFFIX,generativeai.google",
+  "DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com",
+  "DOMAIN-SUFFIX,aisandbox-pa.googleapis.com",
+  "DOMAIN-SUFFIX,robinfrontend-pa.googleapis.com",
+  "DOMAIN-SUFFIX,aistudio.google.com",
+  "DOMAIN-SUFFIX,generativelanguage.googleapis.com",
+  "DOMAIN-SUFFIX,apis.google.com",
+  "DOMAIN-SUFFIX,x.ai",
+  "DOMAIN-SUFFIX,grok.com",
+  "DOMAIN-SUFFIX,chorus.sh",
+  "DOMAIN,ai.google.dev",
+  "DOMAIN,alkalimakersuite-pa.clients6.google.com",
+  "DOMAIN,alkalicore-pa.clients6.google.com",
+  "DOMAIN,waa-pa.clients6.google.com",
+  "DOMAIN,makersuite.google.com",
+  "DOMAIN,copilot.microsoft.com",
+];
+
+const AI_DNS_NAMESERVERS = [
+  `https://1.1.1.1/dns-query#${AI_EGRESS.groupName}`,
+  `https://8.8.8.8/dns-query#${AI_EGRESS.groupName}`,
 ];
 
 const AIRPORT_RULES = [
@@ -88,12 +191,56 @@ function findAirportGroup(config) {
   const proxyGroup = groups.find(group => group.name === "PROXY" && group.type === "select");
   if (proxyGroup) return proxyGroup.name;
 
-  const selectGroup = groups.find(group => group.type === "select");
+  const selectGroup = groups.find(group =>
+    group.type === "select" && group.name !== AI_EGRESS.groupName
+  );
   return selectGroup && selectGroup.name;
 }
 
+function removeByName(items, name) {
+  return (items || []).filter(item => item.name !== name);
+}
+
+function applyAiEgress(config) {
+  const nodeNames = AI_EGRESS_PROXIES.map(proxy => proxy.name);
+  const nodeNameSet = new Set(nodeNames);
+  config.proxies = [
+    ...AI_EGRESS_PROXIES,
+    ...(config.proxies || []).filter(proxy => !nodeNameSet.has(proxy.name)),
+  ];
+
+  config["proxy-groups"] = removeByName(
+    config["proxy-groups"],
+    AI_EGRESS.groupName
+  );
+  config["proxy-groups"].unshift({
+    name: AI_EGRESS.groupName,
+    type: "select",
+    proxies: nodeNames.length ? nodeNames : ["REJECT-DROP"],
+  });
+}
+
 function appendPolicy(rule, policy) {
+  const noResolve = ",no-resolve";
+  if (rule.endsWith(noResolve)) {
+    return `${rule.slice(0, -noResolve.length)},${policy}${noResolve}`;
+  }
   return `${rule},${policy}`;
+}
+
+function aiDnsPolicy() {
+  const policy = {};
+
+  for (const rule of AI_RULES) {
+    const [type, value] = rule.split(",", 2);
+    if (type === "DOMAIN") {
+      policy[value] = AI_DNS_NAMESERVERS;
+    } else if (type === "DOMAIN-SUFFIX") {
+      policy[`+.${value}`] = AI_DNS_NAMESERVERS;
+    }
+  }
+
+  return policy;
 }
 
 function isIpLiteral(server) {
@@ -129,12 +276,12 @@ function applyDns(config) {
       "1.1.1.1",
       "8.8.8.8",
     ],
-    nameserver: [
-      "https://1.1.1.1/dns-query",
-      "https://8.8.8.8/dns-query",
-    ],
+    // Default all non-CN DNS to the fixed AI egress. This is intentionally
+    // broad: a second DNS egress is a larger risk than over-routing DNS.
+    nameserver: AI_DNS_NAMESERVERS,
     fallback: [],
     "nameserver-policy": {
+      ...aiDnsPolicy(),
       "geosite:cn": [
         "https://223.5.5.5/dns-query",
         "https://1.12.12.12/dns-query",
@@ -205,11 +352,11 @@ function applySniffer(config) {
 }
 
 function applyRules(config, airport) {
-  if (!airport) return;
-
-  config.rules = (config.rules || []).map(rule =>
-    rule === "MATCH,DIRECT" ? `MATCH,${airport}` : rule
-  );
+  if (airport) {
+    config.rules = (config.rules || []).map(rule =>
+      rule === "MATCH,DIRECT" ? `MATCH,${airport}` : rule
+    );
+  }
 
   const prependRule = [
     "IP-CIDR,127.0.0.0/8,DIRECT",
@@ -219,6 +366,9 @@ function applyRules(config, airport) {
     "DOMAIN,localhost,DIRECT",
     "DOMAIN-SUFFIX,local,DIRECT",
     "DOMAIN-SUFFIX,ts.net,DIRECT",
+
+    ...AI_RULES.map(rule => appendPolicy(rule, AI_EGRESS.groupName)),
+
     "DOMAIN-KEYWORD,immersivetranslate,DIRECT",
     "DOMAIN-KEYWORD,feishu,DIRECT",
 
@@ -226,25 +376,42 @@ function applyRules(config, airport) {
     ...AIRPORT_CONTROL_RULES,
 
     "PROCESS-NAME,WeChat,DIRECT",
-    `DOMAIN,mp.weixin.qq.com,${airport}`,
-    `PROCESS-NAME,git-remote-http,${airport}`,
-    `PROCESS-PATH-REGEX,.*/\\.local/share/claude/.*,${airport}`,
-
-    ...AI_RULES.map(rule => appendPolicy(rule, airport)),
-    ...AIRPORT_RULES.map(rule => appendPolicy(rule, airport)),
+    ...(airport ? [
+      `DOMAIN,mp.weixin.qq.com,${airport}`,
+      `PROCESS-NAME,git-remote-http,${airport}`,
+      ...AIRPORT_RULES.map(rule => appendPolicy(rule, airport)),
+    ] : []),
 
     "GEOIP,PRIVATE,DIRECT",
     "GEOIP,CN,DIRECT",
-    ...AIRPORT_GEOIP_RULES.map(rule => appendPolicy(rule, airport)),
+    ...(airport
+      ? AIRPORT_GEOIP_RULES.map(rule => appendPolicy(rule, airport))
+      : []),
   ];
 
   config.rules = prependRule.concat(config.rules || []);
 }
 
 function main(config) {
+  // A historical profile may still bind this transformer in addition to the
+  // global Script. Treat the injected group + nodes as an idempotency marker.
+  const existingGroup = (config["proxy-groups"] || []).some(
+    group => group.name === AI_EGRESS.groupName
+  );
+  const existingNodes = new Set(
+    (config.proxies || []).map(proxy => proxy.name)
+  );
+  if (
+    existingGroup &&
+    AI_EGRESS_PROXIES.every(proxy => existingNodes.has(proxy.name))
+  ) {
+    return config;
+  }
+
   applyDns(config);
   applyTun(config);
   applySniffer(config);
+  applyAiEgress(config);
   const airport = findAirportGroup(config);
   applyRules(config, airport);
   return config;

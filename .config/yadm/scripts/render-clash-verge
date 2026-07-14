@@ -1,0 +1,89 @@
+#!/bin/bash
+set -euo pipefail
+
+TEMPLATE="${CLASH_VERGE_SCRIPT_TEMPLATE:-$HOME/.config/clash-verge/Script.js.tpl}"
+PRIVATE_INVENTORY="${AI_EGRESS_PRIVATE_FILE:-$HOME/.config/clash-verge/private/ai-egress.json}"
+APP_DIR="${CLASH_VERGE_APP_DIR:-$HOME/Library/Application Support/io.github.clash-verge-rev.clash-verge-rev}"
+OUTPUT="${CLASH_VERGE_SCRIPT_OUTPUT:-$APP_DIR/profiles/Script.js}"
+
+for required in "$TEMPLATE" "$PRIVATE_INVENTORY"; do
+    if [ ! -f "$required" ]; then
+        echo "Error: required Clash Verge input is missing: $required" >&2
+        exit 1
+    fi
+done
+
+mkdir -p "$(dirname "$OUTPUT")"
+TEMP_OUTPUT="$(mktemp "$(dirname "$OUTPUT")/.Script.js.XXXXXX")"
+trap 'rm -f "$TEMP_OUTPUT"' EXIT
+
+TEMPLATE="$TEMPLATE" \
+PRIVATE_INVENTORY="$PRIVATE_INVENTORY" \
+TEMP_OUTPUT="$TEMP_OUTPUT" \
+python3 <<'PY'
+import json
+import os
+import stat
+from pathlib import Path
+
+template_path = Path(os.environ["TEMPLATE"])
+private_path = Path(os.environ["PRIVATE_INVENTORY"])
+output_path = Path(os.environ["TEMP_OUTPUT"])
+
+if private_path.stat().st_mode & (stat.S_IRWXG | stat.S_IRWXO):
+    raise SystemExit(
+        f"private inventory permissions are too broad: {private_path} "
+        "(expected mode 0600 or stricter)"
+    )
+
+try:
+    inventory = json.loads(private_path.read_text())
+except json.JSONDecodeError as exc:
+    raise SystemExit(f"invalid private inventory JSON: {exc}") from exc
+
+if not isinstance(inventory, dict):
+    raise SystemExit("private inventory must be a JSON object")
+
+primary = inventory.get("primary")
+proxies = inventory.get("proxies")
+if not isinstance(primary, str) or not primary:
+    raise SystemExit("private inventory primary must be a non-empty string")
+if not isinstance(proxies, list) or not proxies:
+    raise SystemExit("private inventory proxies must be a non-empty array")
+
+required_fields = {"name", "type", "server", "port"}
+names = []
+for index, proxy in enumerate(proxies):
+    if not isinstance(proxy, dict):
+        raise SystemExit(f"proxy #{index + 1} must be an object")
+    missing = required_fields - proxy.keys()
+    if missing:
+        raise SystemExit(
+            f"proxy #{index + 1} is missing required fields: "
+            + ", ".join(sorted(missing))
+        )
+    names.append(proxy["name"])
+
+if len(names) != len(set(names)):
+    raise SystemExit("private inventory proxy names must be unique")
+if primary not in names:
+    raise SystemExit("private inventory primary must match one proxy name")
+
+placeholder = "__AI_EGRESS_PRIVATE__"
+template = template_path.read_text()
+if template.count(placeholder) != 1:
+    raise SystemExit(f"template must contain exactly one {placeholder} placeholder")
+
+rendered = template.replace(
+    placeholder,
+    json.dumps(inventory, ensure_ascii=False, separators=(",", ":")),
+)
+output_path.write_text(rendered)
+PY
+
+node --check < "$TEMP_OUTPUT"
+chmod 600 "$TEMP_OUTPUT"
+mv -f "$TEMP_OUTPUT" "$OUTPUT"
+trap - EXIT
+
+echo "Clash Verge Script rendered: $OUTPUT"
