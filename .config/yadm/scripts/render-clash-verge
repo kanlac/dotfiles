@@ -50,8 +50,8 @@ policies = inventory.get("policies")
 route_excludes = inventory.get("routeExcludeAddresses")
 if not isinstance(providers, dict) or not providers:
     raise SystemExit("private inventory providers must be a non-empty object")
-if not isinstance(policies, dict) or set(policies) != {"claude", "openai"}:
-    raise SystemExit("private inventory policies must contain exactly claude and openai")
+if not isinstance(policies, dict) or set(policies) != {"anthropic", "openai"}:
+    raise SystemExit("private inventory policies must contain exactly anthropic and openai")
 if not isinstance(route_excludes, list) or not route_excludes:
     raise SystemExit("private inventory routeExcludeAddresses must be a non-empty array")
 if len(route_excludes) != len(set(route_excludes)):

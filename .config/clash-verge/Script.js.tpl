@@ -68,12 +68,12 @@ const AIRPORT_RULES = [
 ];
 
 const REMOTE_RULE_PROVIDERS = {
-  "kanlac-claude": {
+  "kanlac-anthropic": {
     type: "http",
     behavior: "classical",
     format: "text",
     url: "https://raw.githubusercontent.com/kanlac/proxy-rules/main/rules/ai/anthropic.list",
-    path: "./ruleset/kanlac-claude.list",
+    path: "./ruleset/kanlac-anthropic.list",
     interval: 86400,
   },
   "kanlac-openai": {
@@ -189,7 +189,7 @@ function applyDns(config, airport) {
   const defaultNameservers = airport
     ? dnsNameserversFor(airport)
     : ["https://1.1.1.1/dns-query", "https://8.8.8.8/dns-query"];
-  const claudeGroup = SERVICE_EGRESS_POLICIES.claude.group;
+  const anthropicGroup = SERVICE_EGRESS_POLICIES.anthropic.group;
   const openaiGroup = SERVICE_EGRESS_POLICIES.openai.group;
   config.dns = {
     enable: true,
@@ -210,7 +210,7 @@ function applyDns(config, airport) {
     nameserver: defaultNameservers,
     fallback: [],
     "nameserver-policy": {
-      "rule-set:kanlac-claude": dnsNameserversFor(claudeGroup),
+      "rule-set:kanlac-anthropic": dnsNameserversFor(anthropicGroup),
       "rule-set:kanlac-openai": dnsNameserversFor(openaiGroup),
       "geosite:cn": [
         "https://223.5.5.5/dns-query",
@@ -315,9 +315,9 @@ function applyRules(config, airport) {
     "RULE-SET,kanlac-spotify,DIRECT",
 
     ...CLAUDE_PROCESS_RULES.map(rule =>
-      appendPolicy(rule, SERVICE_EGRESS_POLICIES.claude.group)
+      appendPolicy(rule, SERVICE_EGRESS_POLICIES.anthropic.group)
     ),
-    `RULE-SET,kanlac-claude,${SERVICE_EGRESS_POLICIES.claude.group}`,
+    `RULE-SET,kanlac-anthropic,${SERVICE_EGRESS_POLICIES.anthropic.group}`,
     ...OPENAI_PROCESS_RULES.map(rule =>
       appendPolicy(rule, SERVICE_EGRESS_POLICIES.openai.group)
     ),
