@@ -10,21 +10,15 @@
  * own config.yaml. This script only controls proxies / groups / rules / dns / tun.
  */
 
-const AI_EGRESS = {
-  groupName: "🤖 AI-EGRESS",
-};
-
 // Rendered from an ignored, mode-0600 local inventory. Never put real proxy
 // credentials in this public template.
-const AI_EGRESS_PRIVATE = __AI_EGRESS_PRIVATE__;
-const AI_EGRESS_PROXIES = [
-  ...AI_EGRESS_PRIVATE.proxies.filter(
-    proxy => proxy.name === AI_EGRESS_PRIVATE.primary
-  ),
-  ...AI_EGRESS_PRIVATE.proxies.filter(
-    proxy => proxy.name !== AI_EGRESS_PRIVATE.primary
-  ),
-];
+const SERVICE_ROUTING_PRIVATE = __SERVICE_ROUTING_PRIVATE__;
+const SERVICE_ROUTING_PROVIDERS = SERVICE_ROUTING_PRIVATE.providers;
+const SERVICE_EGRESS_POLICIES = SERVICE_ROUTING_PRIVATE.policies;
+const SERVICE_ROUTING_ROUTE_EXCLUDES = SERVICE_ROUTING_PRIVATE.routeExcludeAddresses;
+const SERVICE_GROUP_NAMES = new Set(
+  Object.values(SERVICE_EGRESS_POLICIES).map(policy => policy.group)
+);
 
 const FAKE_IP_FILTER = [
   "*.lan",
@@ -48,111 +42,57 @@ const FAKE_IP_FILTER = [
   "kanlac.store",
 ];
 
-const AI_RULES = [
-  // Process rules are the fail-safe for new or shared vendor domains.
+const CLAUDE_PROCESS_RULES = [
   "PROCESS-NAME,claude",
   "PROCESS-NAME,Claude",
+  "PROCESS-PATH-REGEX,.*/(@anthropic-ai/claude-code|\\.local/share/claude)/.*",
+];
+
+const OPENAI_PROCESS_RULES = [
   "PROCESS-NAME,codex",
   "PROCESS-NAME,codex-code-mode-host",
   "PROCESS-NAME,ChatGPT",
-  "PROCESS-PATH-REGEX,.*/(@anthropic-ai/claude-code|@openai/codex|\\.local/share/claude|\\.codex)/.*",
-
-  // Anthropic / Claude.
-  "DOMAIN-KEYWORD,claude",
-  "DOMAIN-KEYWORD,anthropic",
-  "DOMAIN-SUFFIX,anthropic.com",
-  "DOMAIN-SUFFIX,claude.ai",
-  "DOMAIN-SUFFIX,claude.com",
-
-  // OpenAI / ChatGPT / Codex core and product domains.
-  "DOMAIN-KEYWORD,openai",
-  "DOMAIN-KEYWORD,chatgpt",
-  "DOMAIN-KEYWORD,codex",
-  "DOMAIN-SUFFIX,openai.com",
-  "DOMAIN-SUFFIX,chatgpt.com",
-  "DOMAIN-SUFFIX,chat.com",
-  "DOMAIN-SUFFIX,ai.com",
-  "DOMAIN-SUFFIX,sora.com",
-  "DOMAIN-SUFFIX,oaiusercontent.com",
-  "DOMAIN-SUFFIX,oaistatic.com",
-  "DOMAIN-SUFFIX,auth.openai.com",
-  "DOMAIN-SUFFIX,openaimerge.com",
-  "DOMAIN-SUFFIX,prodregistryv2.org",
-  "DOMAIN,chat.openai.com.cdn.cloudflare.net",
-  "DOMAIN,openai-api.arkoselabs.com",
-  "DOMAIN,openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net",
-  "DOMAIN,openaicomproductionae4b.blob.core.windows.net",
-  "DOMAIN,production-openaicom-storage.azureedge.net",
-  "DOMAIN-SUFFIX,openaiapi-site.azureedge.net",
-  "DOMAIN-SUFFIX,openaicom.imgix.net",
-
-  // OpenAI auth, risk control, feature flags, telemetry, files and realtime.
-  "DOMAIN-SUFFIX,statsig.com",
-  "DOMAIN-SUFFIX,statsigapi.net",
-  "DOMAIN-SUFFIX,featuregates.org",
-  "DOMAIN-SUFFIX,featureassets.org",
-  "DOMAIN-SUFFIX,arkoselabs.com",
-  "DOMAIN-SUFFIX,auth0.com",
-  "DOMAIN-SUFFIX,livekit.cloud",
-  "DOMAIN-SUFFIX,workos.com",
-  "DOMAIN-SUFFIX,workoscdn.com",
-  "DOMAIN-SUFFIX,intercom.io",
-  "DOMAIN-SUFFIX,intercomcdn.com",
-  "DOMAIN-SUFFIX,launchdarkly.com",
-  "DOMAIN-SUFFIX,algolia.net",
-  "DOMAIN-SUFFIX,segment.io",
-  "DOMAIN-SUFFIX,sentry.io",
-  "DOMAIN-SUFFIX,observeit.net",
-  "DOMAIN-SUFFIX,identrust.com",
-  "DOMAIN-SUFFIX,sendgrid.net",
-  "DOMAIN,rum.browser-intake-datadoghq.com",
-  "DOMAIN,browser-intake-datadoghq.com",
-  "DOMAIN,static.cloudflareinsights.com",
-  "DOMAIN-SUFFIX,challenges.cloudflare.com",
-  "DOMAIN,cdn.usefathom.com",
-  "DOMAIN,js.stripe.com",
-  "DOMAIN,humb.apple.com",
-  "IP-CIDR,24.199.123.28/32,no-resolve",
-  "IP-CIDR,64.23.132.171/32,no-resolve",
-
-  // Other major AI services from the BosLife / Nexitally AI groups.
-  "DOMAIN-KEYWORD,gemini",
-  "DOMAIN-KEYWORD,generativeai",
-  "DOMAIN-KEYWORD,perplexity",
-  "DOMAIN-KEYWORD,colab",
-  "DOMAIN-KEYWORD,developerprofiles",
-  "DOMAIN-SUFFIX,perplexity.ai",
-  "DOMAIN-SUFFIX,pplx.ai",
-  "DOMAIN-SUFFIX,bard.google.com",
-  "DOMAIN-SUFFIX,deepmind.com",
-  "DOMAIN-SUFFIX,deepmind.google",
-  "DOMAIN-SUFFIX,generativeai.google",
-  "DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com",
-  "DOMAIN-SUFFIX,aisandbox-pa.googleapis.com",
-  "DOMAIN-SUFFIX,robinfrontend-pa.googleapis.com",
-  "DOMAIN-SUFFIX,aistudio.google.com",
-  "DOMAIN-SUFFIX,generativelanguage.googleapis.com",
-  "DOMAIN-SUFFIX,apis.google.com",
-  "DOMAIN-SUFFIX,x.ai",
-  "DOMAIN-SUFFIX,grok.com",
-  "DOMAIN-SUFFIX,chorus.sh",
-  "DOMAIN,ai.google.dev",
-  "DOMAIN,alkalimakersuite-pa.clients6.google.com",
-  "DOMAIN,alkalicore-pa.clients6.google.com",
-  "DOMAIN,waa-pa.clients6.google.com",
-  "DOMAIN,makersuite.google.com",
-  "DOMAIN,copilot.microsoft.com",
+  "PROCESS-PATH-REGEX,.*/(@openai/codex|\\.codex)/.*",
 ];
 
-const AI_DNS_NAMESERVERS = [
-  `https://1.1.1.1/dns-query#${AI_EGRESS.groupName}`,
-  `https://8.8.8.8/dns-query#${AI_EGRESS.groupName}`,
-];
+function dnsNameserversFor(policy) {
+  return [
+    `https://1.1.1.1/dns-query#${policy}`,
+    `https://8.8.8.8/dns-query#${policy}`,
+  ];
+}
 
 const AIRPORT_RULES = [
   "DOMAIN-KEYWORD,reddit",
   "DOMAIN-KEYWORD,runpod",
 ];
+
+const REMOTE_RULE_PROVIDERS = {
+  "kanlac-claude": {
+    type: "http",
+    behavior: "classical",
+    format: "text",
+    url: "https://raw.githubusercontent.com/kanlac/proxy-rules/main/rules/ai/anthropic.list",
+    path: "./ruleset/kanlac-claude.list",
+    interval: 86400,
+  },
+  "kanlac-openai": {
+    type: "http",
+    behavior: "classical",
+    format: "text",
+    url: "https://raw.githubusercontent.com/kanlac/proxy-rules/main/rules/ai/openai.list",
+    path: "./ruleset/kanlac-openai.list",
+    interval: 86400,
+  },
+  "kanlac-spotify": {
+    type: "http",
+    behavior: "classical",
+    format: "yaml",
+    url: "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Spotify/Spotify_No_Resolve.yaml",
+    path: "./ruleset/spotify.yaml",
+    interval: 86400,
+  },
+};
 
 // 公共 WiFi 强制门户（captive portal）探测流量一律直连，
 // 不要走代理（登录前代理不可达），让系统能弹出登录页。
@@ -192,7 +132,7 @@ function findAirportGroup(config) {
   if (proxyGroup) return proxyGroup.name;
 
   const selectGroup = groups.find(group =>
-    group.type === "select" && group.name !== AI_EGRESS.groupName
+    group.type === "select" && !SERVICE_GROUP_NAMES.has(group.name)
   );
   return selectGroup && selectGroup.name;
 }
@@ -201,23 +141,21 @@ function removeByName(items, name) {
   return (items || []).filter(item => item.name !== name);
 }
 
-function applyAiEgress(config) {
-  const nodeNames = AI_EGRESS_PROXIES.map(proxy => proxy.name);
-  const nodeNameSet = new Set(nodeNames);
-  config.proxies = [
-    ...AI_EGRESS_PROXIES,
-    ...(config.proxies || []).filter(proxy => !nodeNameSet.has(proxy.name)),
-  ];
+function applyServiceEgress(config) {
+  config["proxy-providers"] = {
+    ...(config["proxy-providers"] || {}),
+    ...SERVICE_ROUTING_PROVIDERS,
+  };
 
-  config["proxy-groups"] = removeByName(
-    config["proxy-groups"],
-    AI_EGRESS.groupName
-  );
-  config["proxy-groups"].unshift({
-    name: AI_EGRESS.groupName,
-    type: "select",
-    proxies: nodeNames.length ? nodeNames : ["REJECT-DROP"],
-  });
+  for (const policy of Object.values(SERVICE_EGRESS_POLICIES).reverse()) {
+    config["proxy-groups"] = removeByName(config["proxy-groups"], policy.group);
+    config["proxy-groups"].unshift({
+      name: policy.group,
+      type: "select",
+      proxies: ["REJECT-DROP"],
+      use: policy.use,
+    });
+  }
 }
 
 function appendPolicy(rule, policy) {
@@ -228,27 +166,15 @@ function appendPolicy(rule, policy) {
   return `${rule},${policy}`;
 }
 
-function aiDnsPolicy() {
-  const policy = {};
-
-  for (const rule of AI_RULES) {
-    const [type, value] = rule.split(",", 2);
-    if (type === "DOMAIN") {
-      policy[value] = AI_DNS_NAMESERVERS;
-    } else if (type === "DOMAIN-SUFFIX") {
-      policy[`+.${value}`] = AI_DNS_NAMESERVERS;
-    }
-  }
-
-  return policy;
-}
-
 function isIpLiteral(server) {
   return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(server);
 }
 
 function routeExcludeAddresses(config) {
-  const addresses = new Set(config.tun?.["route-exclude-address"] || []);
+  const addresses = new Set([
+    ...(config.tun?.["route-exclude-address"] || []),
+    ...SERVICE_ROUTING_ROUTE_EXCLUDES,
+  ]);
 
   for (const proxy of config.proxies || []) {
     if (isIpLiteral(proxy.server)) {
@@ -259,7 +185,12 @@ function routeExcludeAddresses(config) {
   return [...addresses].sort();
 }
 
-function applyDns(config) {
+function applyDns(config, airport) {
+  const defaultNameservers = airport
+    ? dnsNameserversFor(airport)
+    : ["https://1.1.1.1/dns-query", "https://8.8.8.8/dns-query"];
+  const claudeGroup = SERVICE_EGRESS_POLICIES.claude.group;
+  const openaiGroup = SERVICE_EGRESS_POLICIES.openai.group;
   config.dns = {
     enable: true,
     ipv6: false,
@@ -276,12 +207,11 @@ function applyDns(config) {
       "1.1.1.1",
       "8.8.8.8",
     ],
-    // Default all non-CN DNS to the fixed AI egress. This is intentionally
-    // broad: a second DNS egress is a larger risk than over-routing DNS.
-    nameserver: AI_DNS_NAMESERVERS,
+    nameserver: defaultNameservers,
     fallback: [],
     "nameserver-policy": {
-      ...aiDnsPolicy(),
+      "rule-set:kanlac-claude": dnsNameserversFor(claudeGroup),
+      "rule-set:kanlac-openai": dnsNameserversFor(openaiGroup),
       "geosite:cn": [
         "https://223.5.5.5/dns-query",
         "https://1.12.12.12/dns-query",
@@ -351,6 +281,19 @@ function applySniffer(config) {
   };
 }
 
+function applyRuleProviders(config, airport) {
+  const downloadProxy = airport || "DIRECT";
+  config["rule-providers"] = {
+    ...(config["rule-providers"] || {}),
+    ...Object.fromEntries(
+      Object.entries(REMOTE_RULE_PROVIDERS).map(([name, provider]) => [
+        name,
+        {...provider, proxy: downloadProxy},
+      ])
+    ),
+  };
+}
+
 function applyRules(config, airport) {
   if (airport) {
     config.rules = (config.rules || []).map(rule =>
@@ -367,7 +310,18 @@ function applyRules(config, airport) {
     "DOMAIN-SUFFIX,local,DIRECT",
     "DOMAIN-SUFFIX,ts.net,DIRECT",
 
-    ...AI_RULES.map(rule => appendPolicy(rule, AI_EGRESS.groupName)),
+    // Keep Spotify direct on both the desktop app and web/mobile clients.
+    "PROCESS-NAME,Spotify,DIRECT",
+    "RULE-SET,kanlac-spotify,DIRECT",
+
+    ...CLAUDE_PROCESS_RULES.map(rule =>
+      appendPolicy(rule, SERVICE_EGRESS_POLICIES.claude.group)
+    ),
+    `RULE-SET,kanlac-claude,${SERVICE_EGRESS_POLICIES.claude.group}`,
+    ...OPENAI_PROCESS_RULES.map(rule =>
+      appendPolicy(rule, SERVICE_EGRESS_POLICIES.openai.group)
+    ),
+    `RULE-SET,kanlac-openai,${SERVICE_EGRESS_POLICIES.openai.group}`,
 
     "DOMAIN-KEYWORD,immersivetranslate,DIRECT",
     "DOMAIN-KEYWORD,feishu,DIRECT",
@@ -394,25 +348,28 @@ function applyRules(config, airport) {
 
 function main(config) {
   // A historical profile may still bind this transformer in addition to the
-  // global Script. Treat the injected group + nodes as an idempotency marker.
-  const existingGroup = (config["proxy-groups"] || []).some(
-    group => group.name === AI_EGRESS.groupName
+  // global Script. Treat the injected group + providers as an idempotency marker.
+  const existingGroups = new Map(
+    (config["proxy-groups"] || []).map(group => [group.name, group])
   );
-  const existingNodes = new Set(
-    (config.proxies || []).map(proxy => proxy.name)
-  );
+  const existingProviders = config["proxy-providers"] || {};
   if (
-    existingGroup &&
-    AI_EGRESS_PROXIES.every(proxy => existingNodes.has(proxy.name))
+    Object.values(SERVICE_EGRESS_POLICIES).every(policy => {
+      const group = existingGroups.get(policy.group);
+      return group && policy.use.every(provider =>
+        group.use?.includes(provider) && existingProviders[provider]
+      );
+    })
   ) {
     return config;
   }
 
-  applyDns(config);
+  const airport = findAirportGroup(config);
+  applyDns(config, airport);
   applyTun(config);
   applySniffer(config);
-  applyAiEgress(config);
-  const airport = findAirportGroup(config);
+  applyServiceEgress(config);
+  applyRuleProviders(config, airport);
   applyRules(config, airport);
   return config;
 }

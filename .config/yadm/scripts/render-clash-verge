@@ -2,7 +2,7 @@
 set -euo pipefail
 
 TEMPLATE="${CLASH_VERGE_SCRIPT_TEMPLATE:-$HOME/.config/clash-verge/Script.js.tpl}"
-PRIVATE_INVENTORY="${AI_EGRESS_PRIVATE_FILE:-$HOME/.config/clash-verge/private/ai-egress.json}"
+PRIVATE_INVENTORY="${SERVICE_ROUTING_PRIVATE_FILE:-$HOME/.config/clash-verge/private/providers.json}"
 APP_DIR="${CLASH_VERGE_APP_DIR:-$HOME/Library/Application Support/io.github.clash-verge-rev.clash-verge-rev}"
 OUTPUT="${CLASH_VERGE_SCRIPT_OUTPUT:-$APP_DIR/profiles/Script.js}"
 
@@ -22,6 +22,7 @@ PRIVATE_INVENTORY="$PRIVATE_INVENTORY" \
 TEMP_OUTPUT="$TEMP_OUTPUT" \
 python3 <<'PY'
 import json
+import ipaddress
 import os
 import stat
 from pathlib import Path
@@ -44,32 +45,72 @@ except json.JSONDecodeError as exc:
 if not isinstance(inventory, dict):
     raise SystemExit("private inventory must be a JSON object")
 
-primary = inventory.get("primary")
-proxies = inventory.get("proxies")
-if not isinstance(primary, str) or not primary:
-    raise SystemExit("private inventory primary must be a non-empty string")
-if not isinstance(proxies, list) or not proxies:
-    raise SystemExit("private inventory proxies must be a non-empty array")
+providers = inventory.get("providers")
+policies = inventory.get("policies")
+route_excludes = inventory.get("routeExcludeAddresses")
+if not isinstance(providers, dict) or not providers:
+    raise SystemExit("private inventory providers must be a non-empty object")
+if not isinstance(policies, dict) or set(policies) != {"claude", "openai"}:
+    raise SystemExit("private inventory policies must contain exactly claude and openai")
+if not isinstance(route_excludes, list) or not route_excludes:
+    raise SystemExit("private inventory routeExcludeAddresses must be a non-empty array")
+if len(route_excludes) != len(set(route_excludes)):
+    raise SystemExit("private inventory routeExcludeAddresses entries must be unique")
+for cidr in route_excludes:
+    try:
+        network = ipaddress.ip_network(cidr, strict=True)
+    except (TypeError, ValueError) as exc:
+        raise SystemExit(f"invalid route exclude CIDR: {cidr!r}") from exc
+    if network.version != 4 or network.prefixlen != 32:
+        raise SystemExit(f"route exclude must be an IPv4 /32: {cidr!r}")
 
-required_fields = {"name", "type", "server", "port"}
-names = []
-for index, proxy in enumerate(proxies):
-    if not isinstance(proxy, dict):
-        raise SystemExit(f"proxy #{index + 1} must be an object")
-    missing = required_fields - proxy.keys()
+required_fields = {"type", "url", "path", "interval"}
+paths = []
+for provider_id, provider in providers.items():
+    if not isinstance(provider_id, str) or not provider_id:
+        raise SystemExit("provider IDs must be non-empty strings")
+    if not isinstance(provider, dict):
+        raise SystemExit(f"provider {provider_id!r} must be an object")
+    missing = required_fields - provider.keys()
     if missing:
         raise SystemExit(
-            f"proxy #{index + 1} is missing required fields: "
+            f"provider {provider_id!r} is missing required fields: "
             + ", ".join(sorted(missing))
         )
-    names.append(proxy["name"])
+    if provider["type"] != "http":
+        raise SystemExit(f"provider {provider_id!r} type must be http")
+    if not isinstance(provider["url"], str) or not provider["url"].startswith("https://"):
+        raise SystemExit(f"provider {provider_id!r} URL must use HTTPS")
+    if not isinstance(provider["path"], str) or not provider["path"].startswith("./"):
+        raise SystemExit(f"provider {provider_id!r} path must be relative")
+    if not isinstance(provider["interval"], int) or provider["interval"] <= 0:
+        raise SystemExit(f"provider {provider_id!r} interval must be positive")
+    paths.append(provider["path"])
 
-if len(names) != len(set(names)):
-    raise SystemExit("private inventory proxy names must be unique")
-if primary not in names:
-    raise SystemExit("private inventory primary must match one proxy name")
+if len(paths) != len(set(paths)):
+    raise SystemExit("private inventory provider paths must be unique")
+group_names = []
+for service, policy in policies.items():
+    if not isinstance(policy, dict):
+        raise SystemExit(f"policy {service!r} must be an object")
+    group = policy.get("group")
+    enabled = policy.get("use")
+    if not isinstance(group, str) or not group:
+        raise SystemExit(f"policy {service!r} group must be a non-empty string")
+    if not isinstance(enabled, list) or not enabled:
+        raise SystemExit(f"policy {service!r} use must be a non-empty array")
+    if len(enabled) != len(set(enabled)):
+        raise SystemExit(f"policy {service!r} use entries must be unique")
+    unknown = [provider_id for provider_id in enabled if provider_id not in providers]
+    if unknown:
+        raise SystemExit(
+            f"policy {service!r} references unknown providers: " + ", ".join(unknown)
+        )
+    group_names.append(group)
+if len(group_names) != len(set(group_names)):
+    raise SystemExit("private inventory policy group names must be unique")
 
-placeholder = "__AI_EGRESS_PRIVATE__"
+placeholder = "__SERVICE_ROUTING_PRIVATE__"
 template = template_path.read_text()
 if template.count(placeholder) != 1:
     raise SystemExit(f"template must contain exactly one {placeholder} placeholder")
