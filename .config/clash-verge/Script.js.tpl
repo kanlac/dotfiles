@@ -16,8 +16,13 @@ const SERVICE_ROUTING_PRIVATE = __SERVICE_ROUTING_PRIVATE__;
 const SERVICE_ROUTING_PROVIDERS = SERVICE_ROUTING_PRIVATE.providers;
 const SERVICE_EGRESS_POLICIES = SERVICE_ROUTING_PRIVATE.policies;
 const SERVICE_ROUTING_ROUTE_EXCLUDES = SERVICE_ROUTING_PRIVATE.routeExcludeAddresses;
+const SPOTIFY_POLICY_GROUP = "SPOTIFY";
+const SPOTIFY_PROVIDER_IDS = Object.keys(SERVICE_ROUTING_PROVIDERS);
 const SERVICE_GROUP_NAMES = new Set(
-  Object.values(SERVICE_EGRESS_POLICIES).map(policy => policy.group)
+  [
+    ...Object.values(SERVICE_EGRESS_POLICIES).map(policy => policy.group),
+    SPOTIFY_POLICY_GROUP,
+  ]
 );
 
 const FAKE_IP_FILTER = [
@@ -156,6 +161,14 @@ function applyServiceEgress(config) {
       use: policy.use,
     });
   }
+
+  config["proxy-groups"] = removeByName(config["proxy-groups"], SPOTIFY_POLICY_GROUP);
+  config["proxy-groups"].unshift({
+    name: SPOTIFY_POLICY_GROUP,
+    type: "select",
+    proxies: ["DIRECT"],
+    use: SPOTIFY_PROVIDER_IDS,
+  });
 }
 
 function appendPolicy(rule, policy) {
@@ -310,13 +323,8 @@ function applyRules(config, airport) {
     "DOMAIN-SUFFIX,local,DIRECT",
     "DOMAIN-SUFFIX,ts.net,DIRECT",
 
-    // Keep daily Spotify traffic direct, but let its app-download endpoint use
-    // the current Profile before the broader process/domain rules can match it.
-    ...(airport ? [
-      `DOMAIN,download.scdn.co,${airport}`,
-    ] : []),
-    "PROCESS-NAME,Spotify,DIRECT",
-    "RULE-SET,kanlac-spotify,DIRECT",
+    "PROCESS-NAME,Spotify,SPOTIFY",
+    "RULE-SET,kanlac-spotify,SPOTIFY",
 
     ...CLAUDE_PROCESS_RULES.map(rule =>
       appendPolicy(rule, SERVICE_EGRESS_POLICIES.anthropic.group)
@@ -363,7 +371,12 @@ function main(config) {
       return group && policy.use.every(provider =>
         group.use?.includes(provider) && existingProviders[provider]
       );
-    })
+    }) &&
+    existingGroups.get(SPOTIFY_POLICY_GROUP)?.proxies?.includes("DIRECT") &&
+    SPOTIFY_PROVIDER_IDS.every(provider =>
+      existingGroups.get(SPOTIFY_POLICY_GROUP)?.use?.includes(provider) &&
+      existingProviders[provider]
+    )
   ) {
     return config;
   }
