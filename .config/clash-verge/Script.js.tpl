@@ -310,7 +310,11 @@ function applyRules(config, airport) {
     "DOMAIN-SUFFIX,local,DIRECT",
     "DOMAIN-SUFFIX,ts.net,DIRECT",
 
-    // Keep Spotify direct on both the desktop app and web/mobile clients.
+    // Keep daily Spotify traffic direct, but let its app-download endpoint use
+    // the current Profile before the broader process/domain rules can match it.
+    ...(airport ? [
+      `DOMAIN,download.scdn.co,${airport}`,
+    ] : []),
     "PROCESS-NAME,Spotify,DIRECT",
     "RULE-SET,kanlac-spotify,DIRECT",
 
