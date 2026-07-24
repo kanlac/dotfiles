@@ -20,8 +20,10 @@
 - **重建分支后必须验证**：如果不得已做了 cherry-pick 重建，必须检查关键文件（入口文件、配置文件、CSS 入口）是否完整，跑一遍 `git diff` 确认改动数量与预期一致
 
 # Git Worktree 规范
-- worktree 建在仓库的同级目录，命名为 `<repo>-<name>`，命令 `git worktree add ../<repo>-<name> -b <branch>`（path 必填，git 无默认值）。例如仓库 `~/Documents/lawyer`，worktree 路径为 `~/Documents/lawyer-ocr-clean`。
-- Claude Code 的 `isolation: "worktree"` 默认放在 `.claude/worktrees/`，与本规范不符；如需手动创建 worktree，按上述同级目录规范执行。
+- 所有 worktree 统一放在 `$WORKTREE_ROOT/<repo>/<name>`（`WORKTREE_ROOT` 默认 `~/worktrees`），按仓库分组，不再放仓库同级目录。
+- 每个有 worktree 的仓库在 `$WORKTREE_ROOT/<repo>.code-workspace` 维护一个 VS Code 多根 workspace 文件（放 worktrees 目录、不进仓库），方便 Remote-SSH 到 `kans-mac-mini` 后直接打开。该文件由 `git worktree list` 自动生成，不手改。
+- 用 `wt` 函数管理（定义在 `~/.config/zsh-custom/worktree.zsh`，oh-my-zsh 自动加载）：`wt add <name>` 创建、`wt rm <name>` 删除、`wt ls` 列出；主仓库或任一 worktree 内都能运行，创建/删除会自动重生成 workspace 文件。
+- Claude Code 的 `isolation: "worktree"` 默认放在 `.claude/worktrees/`，与本规范不符；如需手动创建 worktree，用 `wt` 函数或按上述规范执行。
 
 # GitHub 评论发布规则
 - 需要在 GitHub issue/PR 上发布评论、回复维护者、解释问题或补充信息时，先把拟发布内容作为草稿发给用户确认；用户明确同意后再调用 GitHub/`gh` 写入。除非用户在当前消息中明确要求“直接发/帮我回复”，否则不要代发。
