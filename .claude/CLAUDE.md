@@ -86,6 +86,13 @@
 - **项目 CLAUDE.md**（项目根目录 `CLAUDE.md`）：项目专属指令。用户说「更新项目 CLAUDE.md」或未特别指定时，根据内容性质判断归属
 - 严格区分：全局通用的知识（如 Skill 编写规则、代理配置）放用户 CLAUDE.md；项目专属的知识（如数据库 schema、任务编排、行业配置）放项目 CLAUDE.md
 
+# 跨 Agent 共享（Claude Code / Codex CLI）
+
+让项目记忆和 skill 在 Claude Code 与 Codex CLI 之间共用，避免两份漂移：
+
+- **新建项目 AGENTS.md 时，必须同时建一个 CLAUDE.md 与它互为 symlink**（谁是真身都行，方向不限，但 symlink 必须存在），保证两个 agent 读到同一份项目记忆。
+- **Skill 通过目录级 symlink 共享**：让 `.claude/skills` 与 `.codex/skills` 指向同一目录（保留 `.claude/skills` 为真身，`ln -s ../.claude/skills .codex/skills`），两边看到同一套项目级 skill。
+
 # Agent Steroids 项目
 
 - 用于存放共享的、公开的 Claude 插件，个人专属的 skill 放全局 `~/.claude/` 下，不放这个项目
