@@ -43,19 +43,17 @@ cp2() {
     command scp -r "${sources[@]}" "$HOME/Downloads/"
 }
 
-# Reattach to the Mac mini tmux session and silently reconnect after SSH drops.
+# Reattach to a remote tmux session and silently reconnect after SSH drops.
 ssh2() {
     emulate -L zsh
 
-    local remote_user="${1:-${USER}}"
-    local remote_host="${2:-${SSH2_HOST:-kans-mac-mini}}"
-    local target ssh_exit
-
-    if [[ "$remote_user" == *@* ]]; then
-        target="$remote_user"
-    else
-        target="${remote_user}@${remote_host}"
+    if (( $# != 1 )) || [[ "$1" != ?*@?* ]]; then
+        print -u2 'Usage: ssh2 user@host'
+        return 2
     fi
+
+    local target="$1"
+    local ssh_exit
 
     while true; do
         command ssh -tt -q \
