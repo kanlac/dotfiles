@@ -2,17 +2,21 @@
 - 使用 [yadm](https://yadm.io) 管理个人配置文件，详见 `~/README.md`
 
 # Tailscale 内网
-- 可通过 Tailscale 用主机名 `kans-mac-mini` SSH 连到 Mac mini（例如 `ssh kans-mac-mini`），无需公网 IP
+- 可通过 Tailscale 用主机名 `kans-mac-mini` SSH 连到 Mac mini（例如 `ssh kans-mac-mini`）
 
-# Hermes
-- `~/.hermes` 是 Nous Research 的开源 AI agent 平台 hermes-agent：https://github.com/NousResearch/hermes-agent
+# 项目索引
+
+| 项目 | 路径 | 用途 |
+|---|---|---|
+| finance | `~/finance` | 个人/家庭财务记录、计划、决策留痕。含金额等敏感数据，勿外传 |
+| agent-steroids | `~/Documents/agent-steroids` | 共享的公开 Claude 插件。Skill 放 `skills/`、Command 放 `commands/`；个人专属 skill 放 `~/.claude/`，不放这里 |
+| Obsidian 库 | `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obsidian/` | 私密文档 + 写作库，详见下方专节 |
 
 # 飞书 / Lark CLI
 - 处理飞书 / Lark / Feishu 相关任务时，优先使用 `lark-cli`；执行具体操作前，先用 `lark-cli skills list` 判断领域，再用 `lark-cli skills read <skill-name>` 读取官方 skill 文档，不要凭记忆直接调用命令。常见入口：认证/权限读 `lark-shared`，文档读写读 `lark-doc`，云盘文件读 `lark-drive`，消息读 `lark-im`，日历读 `lark-calendar`；官方仓库：https://github.com/larksuite/cli
 
 # Git SSH 配置
 - 默认使用 `github.com`（例如 `git@github.com:user/repo.git`）
-- mindfit 项目使用 `mindfitgit` 作为 git SSH host
 
 # Git 历史重写禁令
 - **不要用 `git filter-branch`**：它会重写整棵 commit 树的 hash，导致分支与 master 断开共同祖先，GitHub 上无法正常 diff/PR。cherry-pick 重建分支时极易丢失文件（亲历：base.css 和 main.js 改动丢失，全站样式崩溃）
@@ -29,34 +33,17 @@
 - 需要在 GitHub issue/PR 上发布评论、回复维护者、解释问题或补充信息时，先把拟发布内容作为草稿发给用户确认；用户明确同意后再调用 GitHub/`gh` 写入。除非用户在当前消息中明确要求“直接发/帮我回复”，否则不要代发。
 
 # 解压含中文文件名的 zip
-- **不要用系统 `unzip` 或命令行 `ditto`**：它们按 cp437 / Mac Roman 瞎解中文名，得到一堆乱码（GUI Archive Utility 反而正常，因为它会读 0x7075）
-- **正确做法**：用 Python `zipfile` 解，并**优先读每个条目的 `0x7075`（Info-ZIP Unicode Path）扩展字段**取真实 UTF-8 名，无该字段再按 GBK 转码兜底；同时跳过 `__MACOSX`、防 zip-slip
-- **损坏/截断的 zip**：先诊断（查末尾有无 EOCD `PK\x05\x06`、最后一个本地头 `PK\x03\x04` 位置、尾部是否全零）。若数据被截断（尾部大段零填充），任何工具都救不回缺失部分，只能用 `zip -FF in --out out` 重建中央目录抢救已有数据——别误判为"索引损坏可完整修复"
+- 别用 `unzip`/`ditto`（按 cp437 瞎解中文名）。用 Python `zipfile`，优先读条目的 `0x7075`（Info-ZIP Unicode Path）取真实 UTF-8 名，无该字段再按 GBK 兜底；跳过 `__MACOSX`、防 zip-slip。截断的 zip 只能 `zip -FF` 抢救已有数据，缺失部分救不回
 
-# Skill 优先原则
-- **有专门 Skill 可用时，必须优先调用 Skill，不要因为"觉得自己能搞定"就绕过**。Skill 封装了专门的流程和质量保障（如 `skill-creator:skill-creator` 用于创建 skill，`superpowers:writing-plans` 用于写计划），跳过它等于放弃专门工具的价值。即使当前上下文已经充足，Skill 的流程本身也是一层额外的质量检查。
-- **默认语义：用户提“改 skill”=改项目源码**。在本会话语境中，默认指向 `~/Documents/agent-steroids`（或其对应工作树）里的源文件，不是 `~/.codex/plugins/cache/...` 中的副本。
+# Skill 规则
+- **用户说"改 skill" = 改项目源码**，默认指 `~/Documents/agent-steroids`（或其工作树）里的源文件，不是 `~/.codex/plugins/cache/...` 的副本
+- **Skill 不能有外部依赖**：不引用 Skill 目录外的路径。需要"参考已有样本"时用搜索指引代替硬编码路径
+- **写方向，不写步骤**：说明意图和方向、给 2-3 个典型示例，而不是 step-by-step 教程。Agent 有判断力
+- **SKILL.md 和 CLAUDE.md 不超过 200 行**，详细流程拆到 `references/` 并被主文档引用
 
-# Skill 编写规则
-- **Skill 不能有外部依赖**：Skill 文档（SKILL.md 及其引用的子文档）中不能引用 Skill 目录外的文件路径（如 `docs/`、`data/`、`sql/` 等）。Skill 是自包含的方法论，不依赖项目中的具体文件。如果需要提示"参考已有样本"，用搜索指引（如"在项目中搜索 xxx"）代替硬编码路径。
-- **Skill 写方向不写步骤**：方法论文档重点说明**意图和方向**（为什么要这么做、典型模板有哪些），而非详细的操作步骤。用 2-3 个典型示例启发 agent 理解目标，而不是写 step-by-step 教程。Agent 是有判断力的，给方向比给步骤更有效。
-- **Skill 要写成通用的**：不要引用个人特有的工具链或配置（如 `agents.json`、`yadm bootstrap`、特定 tmux session 名），而是用通用描述。Skill 面向所有用户，不是只给自己用的备忘录。
-- **SKILL.md 和 CLAUDE.md 不超过 200 行**：超过则指令被稀释。精炼表述，详细流程拆到 `references/` 且必须被主文档引用。
-
-# Chrome 浏览器自动化（强制规则）
-**凡是需要有头（GUI）Chrome 的场景，必须先 invoke `steroids:cdp-chrome` Skill，然后严格遵循其规则。**
-
-适用场景（不限于）：
-- 访问社交媒体：X/Twitter 浏览/发帖、Reddit 采集帖子、Instagram 等
-- **读取社交媒体页面内容**：读取推文、帖子等内容时，直接用 CDP Chrome + `take_snapshot`，**不要先尝试 defuddle 或 WebFetch**——这些工具在社交媒体上必定失败（JS 渲染 + 反爬）
-- 新闻/文章核实：检查发布日期、获取 JS 渲染页面
-- 需要登录态的网站操作
-- 反自动化检测的网站访问
-- 网页表单交互、截图
-
-不适用：无头测试自有代码、PDF 生成、Playwright/Puppeteer 单元测试
-
-**禁止自行启动 Chrome 实例。** 所有 agent 共用一个干净的共享 Chrome（`~/.config/cdp-chrome/`），通过 `mcp__cdp-chrome__*` 工具或直连 CDP API 操作。
+# Chrome 浏览器自动化
+- 需要有头 GUI Chrome 时（社交媒体、登录态、反爬、截图、表单），**必须先 invoke `chrome:cdp-chrome` Skill** 并遵循其规则；读社交媒体内容直接用它，别先试 WebFetch/defuddle
+- **禁止自行启动 Chrome 实例**，所有 agent 共用 `~/.config/cdp-chrome/` 那个共享实例
 
 # 代理配置
 - 通过 `~/.env` 中的 `PROXY=on` 控制代理开关
@@ -64,27 +51,7 @@
 - SSH 代理（`~/.ssh/config`）通过 `ProxyCommand` 检测 `$all_proxy` 是否存在来决定是否走 SOCKS5 代理，不硬编码地址
 - 远程机器下载海外资源慢时，优先用 SSH reverse tunnel 让远端复用本地代理；必须同时验证远端 `curl -x` 能访问目标源、本地 Clash controller 能看到连接命中预期节点。若确认走代理仍慢，再切换节点测速
 - 关闭代理：在 `~/.env` 中删除或注释 `PROXY=on`，然后重启 shell
-
-## 代理对大块 git over HTTPS 传输会截断
-- **现象**：`brew`（尤其 `brew update` 的 tap git fetch）、大体积 `git fetch` / `git ls-remote https://github.com/...` 走 Clash 代理时会卡住几十秒后失败，典型报错 `RPC failed; curl 18 transfer closed with outstanding read data remaining`。节点对大块 git-over-HTTPS 传输会截断。诊断实测：`git ls-remote homebrew-core` 走代理 40s 超时截断，直连 27s 成功。
-- **不是"没用上代理"**：代理是用上了，是节点扛不住大 git 传输。bottle/普通 HTTPS 小请求（ghcr.io 等）走代理是快的（~3s），不受影响。
-- **修复**：
-  - `brew`：用 `HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade <pkg>` 跳过最慢的 tap git fetch；bottle 下载照常走代理。
-  - 一般 git：优先用 SSH 远程（`git@github.com:...`，SSH 走代理 OK，push/fetch 都正常）而非 HTTPS；或对该次操作临时 `env -u http_proxy -u https_proxy -u all_proxy ...` 直连（国内直连 GitHub 有时反而比这个节点稳）。
-
-# Clash Verge 自建节点
-- 模板：`~/.config/clash-verge/Script.js.tpl`，通过 `yadm bootstrap` 用 `~/.env` 变量替换占位符生成 `Script.js`
-- 两个节点通过 `url-test` 组 `🏠 LA` 自动选延迟最低的：
-  - `🏠 LA-Direct`：VLESS+Reality+Vision，直连 VPS（移动数据好用，天津电信拥塞不可用）
-  - `🏠 LA-CDN`：VLESS+WS+TLS，经 Cloudflare CDN（域名 `kanlac.store`，电信宽带用）
-- `~/.env` 中 `LISA_CDN_SERVER` 控制 CDN 节点连接地址（域名或优选 IP），`LISA_CDN_DOMAIN` 始终为域名（用于 SNI/Host）
-- 修改模板后需运行 `yadm bootstrap` 重新生成；Clash Verge 最终应用/重载配置需要用户手动操作
-
-# CLAUDE.md 文件区分
-
-- **用户 CLAUDE.md**（`~/.claude/CLAUDE.md`）：全局指令，跨所有项目生效。用户说「更新用户 CLAUDE.md」指的是这个文件
-- **项目 CLAUDE.md**（项目根目录 `CLAUDE.md`）：项目专属指令。用户说「更新项目 CLAUDE.md」或未特别指定时，根据内容性质判断归属
-- 严格区分：全局通用的知识（如 Skill 编写规则、代理配置）放用户 CLAUDE.md；项目专属的知识（如数据库 schema、任务编排、行业配置）放项目 CLAUDE.md
+- **大块 git-over-HTTPS 走代理会被节点截断**（`brew update` 的 tap fetch、大 `git fetch`/`ls-remote`，报 `curl 18 transfer closed`）。不是没走代理，是节点扛不住。改用 SSH 远程，或该次操作临时 `env -u http_proxy -u https_proxy -u all_proxy` 直连；brew 加 `HOMEBREW_NO_AUTO_UPDATE=1`
 
 # 跨 Agent 共享（Claude Code / Codex CLI）
 
@@ -92,26 +59,6 @@
 
 - **新建项目 AGENTS.md 时，必须同时建一个 CLAUDE.md 与它互为 symlink**（谁是真身都行，方向不限，但 symlink 必须存在），保证两个 agent 读到同一份项目记忆。
 - **Skill 通过目录级 symlink 共享**：让 `.claude/skills` 与 `.codex/skills` 指向同一目录（保留 `.claude/skills` 为真身，`ln -s ../.claude/skills .codex/skills`），两边看到同一套项目级 skill。
-
-# Agent Steroids 项目
-
-- 用于存放共享的、公开的 Claude 插件，个人专属的 skill 放全局 `~/.claude/` 下，不放这个项目
-- 项目路径：`/Users/kan/Documents/agent-steroids`
-- Skill 放在 `skills/` 子目录，Command 放在 `commands/` 子目录
-
-# 法律 LLM-Wiki 仓库（lawyer-*）
-
-法律案件知识编译系统，多仓库协作，均在 `~/Documents/` 下：
-- `lawyer-shared`：共享的 law-wiki 插件/skill（编译方法论）+ prod-profile，跨案件复用
-- `lawyer-dev`：系统配置（SPEC.yaml、governor、schema、文书模板），主开发仓
-- `lawyer-case-qianshou`：单个案件的 Wiki vault（raw 材料 + 编译出的 wiki/）
-- `lawyer-wls-ingest`：材料导入/拆分 pipeline（doc-split、SCHEMA.md）
-
-# 计划文档编写规则
-
-- **闭环**：计划必须从开始执行到最终验证形成完整闭环。不能停在"更新完配置"就结束——必须包含端到端测试、数据校验等步骤，确保改动真正生效
-- **每个 Phase 有验证**：每个阶段结束时必须有可执行的验证步骤（命令、脚本、SQL 查询），不能只写"检查是否正确"
-- **标注人工确认节点**：需要用户决策的节点用醒目标记（如 🔵），并明确说明需要用户确认什么。其余 Phase 默认自主执行，尽量减少用户介入
 
 # 全局一致性（品位要求）
 
@@ -123,17 +70,12 @@
 
 - **不要在文档/代码中硬编码用户名**：Skill 文档、脚本、配置示例中使用 `$HOME`、`~`、`$USER` 等变量或占位符，不要出现具体的用户名（如 `/Users/kan/`）
 - **文档命名规范**：所有文档统一使用 `yyMMdd-` 作为前缀命名（例如 `docs/260603-user-journey.md`），以保持跨项目的时间线清晰可回溯。
-- **密集表格必须先定列宽再验证截图**：仪表盘、管理页、清单页等包含长文本列的 UI，不能依赖浏览器自动表格布局；必须先定义列优先级、固定/最小列宽和长文本处理策略，保证描述、路径、代码、JSON 等长文本列在目标视口可读，低价值字段应压缩、截断或移入详情/导出，并用实际截图验证桌面与窄屏视口不存在挤压、重叠或不可读列。
 
 # 制品文案自检：先坐到用户那把椅子上
 
 做「制品」——交付给用户使用或观看的成品，如 HTML 页面、PDF、报告、幻灯片、界面——时，写任何用户会看到的文字之前，先做一次视角自检：说话人是「产品」，听话人是「用户」，说的是「用户的处境」。凡是在解说功能、点评机制、或对读者/自己旁白的句子，都不是产品在说话，删掉重写。类比只是皮，不能改变所指；风味和准确冲突时，准确优先。
 
 固定的决定（措辞、结构、标准、设计）一次定死、固化成产物（模板/固定串/配置）复用；运行时只产出真正因情况而变的东西（数据）。每次重新生成一个本该固定的东西，就是又一次出错和漂移的机会。
-
-# macOS 通知横幅关闭
-
-- 用 AppleScript 遍历 `NotificationCenter` 进程的所有 group 元素并 click，可触发"点击通知"效果使横幅消失（等同于用户手动点击，会同时打开对应 app）
 
 # 文档查询
 
@@ -148,57 +90,18 @@
 
 需要和 NotebookLM 交互时，优先使用已配置好的 `notebooklm-py` CLI：进入 `$HOME/Documents/Codex/2026-05-25/teng-lin-notebooklm-py-https-github` 后运行 `uv run notebooklm ...`；上游仓库是 https://github.com/teng-lin/notebooklm-py，可用于排查问题或获取更新；认证已保存在 `~/.notebooklm/profiles/default/storage_state.json`，开始前可用 `uv run notebooklm auth check --test --json` 验证，不要重新索要 Google 账号密码。
 
-# Telegram Channel 交互
-
-- 收到 Telegram 消息后，先对该消息发送一个 👀 emoji react，表示正在处理，然后再开始实际工作
-- **当会话接入了 Telegram channel 时，所有回复都通过 Telegram reply 工具发送，不在终端输出回复内容**。终端只用于执行工具调用（查数据库、读文件等），最终结果回复到 Telegram
-- **Telegram 文件上传失败时**：Telegram plugin 的文件发送在 proxy 环境下会失败（Bun TLS bug，详见 `steroids:telegram-agents` Skill 的「Bun Proxy 文件上传问题」章节）。遇到 `Network request for 'sendDocument' failed!` 时，用 curl 直接调 Bot API 绕过：从状态目录的 `.env` 读 bot token，然后 `curl -X POST "https://api.telegram.org/bot$TOKEN/sendDocument" -F chat_id=<id> -F "document=@<path>"`
-
-## Telegram 回复排版（MarkdownV2）
-
-调用 Telegram `reply` / `edit_message` 工具时**必须显式传 `format: "markdownv2"`**。不传等同于 `"text"`，会丢失所有格式；只有 log dump、错误堆栈、原始命令输出等无格式化需求的内容才显式传 `format: "text"`。
-
-**18 个特殊字符必须反斜杠转义**（漏一个就会 `Bad Request: can't parse entities` 整条消息失败）：
-
-`_` `*` `[` `]` `(` `)` `~` `` ` `` `>` `#` `+` `-` `=` `|` `{` `}` `.` `!`
-
-最常漏的四类场景：
-- **日期 / 版本号**：`2026-04-07` → `2026\-04\-07`，`v1.2.3` → `v1\.2\.3`
-- **域名 / 文件路径**：`example.com` → `example\.com`，`src/index.ts` → `src/index\.ts`
-- **英文句尾标点**：`Done.` → `Done\.`，`真的!` → `真的\!`（中文句号不用转义）
-- **行首连字符/井号/大于号**：`- 项目` → `\- 项目`（行首会被解析为列表/引用语法）
-
-三个例外区（原样输出，**不**转义 18 字符）：
-- **格式化标记本身**：`*粗体*`、`_斜体_`、`||剧透||`、`~删除线~` 的成对标记
-- **行内代码 `` `code` `` 和代码块 ` ``` ` 内部**：只转义 `` ` `` 和 `\`，其他字符原样。含复杂符号的片段（正则、JSON、SQL）优先用代码块包裹
-- **Markdown link 的 URL 部分**：`[文字](url)` 里 url 只转义 `)` 和 `\`，URL 自带的 `.` `-` `?` `=` `&` 不转义。例：`[文档](https://example.com/path?a=1&b=2)` 原样发送
-
-**发送前自检**：组装好文本、调用工具**之前**扫一遍——`format` 参数有没有？18 字符除了例外区是否全转义？行首特殊字符是否转义？英文句点/叹号是否转义？
-
-**兜底**：不确定的片段用行内代码 `` ` `` 包住；仍无把握就退回 `format: "text"` 发送纯文本——宁可丢格式，不要让消息发送失败。
-
-**`can't parse entities` 报错时**：立刻用 `edit_message` 或重发 `format: "text"` 纯文本让用户先看到内容，再定位漏转义字符（错误里有 offset 提示）、修好后发 MarkdownV2 版。不要反复试错。
-
 # Obsidian 库
 
-- 路径：`~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obsidian/`
 - 通过 iCloud 跨设备同步，私密文档（基础设施 SOP、账号信息等）放这里而非 memory 或公开仓库
 - 一般文档放 `docs/` 子目录，用 `yyMMdd-` 前缀命名
 - 文件名即标题，文档内部不写一级标题（`# 标题`）
 
-## 写作库（写作 Writing.base）
+## 写作库（posts.base）
 
-- 已发布/待发布的文章通过仓库根目录的 `写作 Writing.base` 追踪，base 过滤条件是 frontmatter `writing == true`
-- **写作笔记直接放仓库根目录**（不放 `docs/` 等子目录），**文件名即标题、不加 `yyMMdd-` 前缀**（区别于一般文档）
-- 必备 frontmatter 字段（缺 `writing: true` 不会进 base）：
-  ```yaml
-  writing: true
-  publish-date: YYYY-MM-DD
-  大标题: <通常同文件名>
-  小标题: <副标题>
-  post_tags: "#标签1 #标签2"   # 一个带引号的字符串，标签用空格分隔
-  ```
-- 正文同样不写一级标题；新建后会自动出现在 base 的 Table 视图（按 `publish-date` 倒序）
+- 已发布/待发布的文章通过仓库根目录的 `posts.base` 追踪，base 过滤条件是 frontmatter `posts == true`
+- **博客文章放 `posts/` 目录**，文件名即标题、不加 `yyMMdd-` 前缀
+- **创建或编辑博客文章前必须先读 `posts/SCHEMA.md`**，frontmatter 字段、post_tags 封闭词表等以该文件为准，这里不再重复
+- 正文不写一级标题；新建后会自动出现在 base 的 Table 视图（按 `publish-date` 倒序）
 - `docs/thread-lawyer/`：律师所 AI 阅卷产品（与 Robin、刘海清律师合作）项目的**非开发**个人知识沉淀——角色定位、合同/股权、法律风险、谈判备忘等
 
 # 参考资料沉淀
