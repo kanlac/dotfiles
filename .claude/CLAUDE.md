@@ -4,6 +4,12 @@
 # Tailscale 内网
 - 可通过 Tailscale 用主机名 `kans-mac-mini` SSH 连到 Mac mini（例如 `ssh kans-mac-mini`）
 
+# artifacts 目录
+- 说「artifacts 目录」时，指的是 Mac mini 上的 `/Users/Shared/artifacts`，对应公网地址 `https://artifacts.kanlac.store/<文件名>`。复制到该目录即可分享链接
+- **这个目录公网无鉴权，任何人拿到 URL 都能访问**，文件名就是唯一的门槛。按内容敏感度选名字：
+  - **含真实人名、报价底线、谈判条款、他人隐私的** —— 必须用不可猜的随机串，且不要把链接贴到任何公开场合
+  - **本来就要发给别人看的成品**（服务说明、分享稿、给客户的页面）—— 可以用有含义的短名字，方便直接发链接
+
 # 项目索引
 
 | 项目 | 路径 | 用途 |
@@ -11,6 +17,7 @@
 | finance | `~/finance` | 个人/家庭财务记录、计划、决策留痕。含金额等敏感数据，勿外传 |
 | agent-steroids | `~/Documents/agent-steroids` | 共享的公开 Claude 插件。Skill 放 `skills/`、Command 放 `commands/`；个人专属 skill 放 `~/.claude/`，不放这里 |
 | Obsidian 库 | `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obsidian/` | 私密文档 + 写作库，详见下方专节 |
+| witness | `~/witness` | 个人目标系统，数据和代码同仓，详见下方专节 |
 
 # 飞书 / Lark CLI
 - 处理飞书 / Lark / Feishu 相关任务时，优先使用 `lark-cli`；执行具体操作前，先用 `lark-cli skills list` 判断领域，再用 `lark-cli skills read <skill-name>` 读取官方 skill 文档，不要凭记忆直接调用命令。常见入口：认证/权限读 `lark-shared`，文档读写读 `lark-doc`，云盘文件读 `lark-drive`，消息读 `lark-im`，日历读 `lark-calendar`；官方仓库：https://github.com/larksuite/cli
@@ -90,8 +97,17 @@
 
 需要和 NotebookLM 交互时，优先使用已配置好的 `notebooklm-py` CLI：进入 `$HOME/Documents/Codex/2026-05-25/teng-lin-notebooklm-py-https-github` 后运行 `uv run notebooklm ...`；上游仓库是 https://github.com/teng-lin/notebooklm-py，可用于排查问题或获取更新；认证已保存在 `~/.notebooklm/profiles/default/storage_state.json`，开始前可用 `uv run notebooklm auth check --test --json` 验证，不要重新索要 Google 账号密码。
 
+# Witness 个人目标系统
+
+见证努力、维持计划一致性的系统：**Goal** 记目标，**Decision / LDR** 记不可变且只能被 supersede 的安排，**Evidence** 分别记努力（0–3）与信号（−3…+3），两者不相加。
+
+- 记录或复盘时，主动读 Obsidian daily note 和用户口述，先讲出判断待用户确认后再落库；**Obsidian 始终只读**。
+- 数据、代码和日常交互用的 `witness` skill 均在 `~/witness`；字段以 `SCHEMA.md` 为唯一权威。
+- 与 `Habits.md`、`thread-*.md` 互相独立，不打通、不同步。
+
 # Obsidian 库
 
+- **未经明确指示，不要在 Obsidian 库里产出任何文件**。库是用户自己的手写空间，agent 默认只读不写。临时产物（HTML、报告、草稿等）一律放会话的 scratchpad 临时目录，随系统重启被清理掉；只有用户明确说「存到 Obsidian / 保存到库里」时才写入
 - 通过 iCloud 跨设备同步，私密文档（基础设施 SOP、账号信息等）放这里而非 memory 或公开仓库
 - 一般文档放 `docs/` 子目录，用 `yyMMdd-` 前缀命名
 - 文件名即标题，文档内部不写一级标题（`# 标题`）
