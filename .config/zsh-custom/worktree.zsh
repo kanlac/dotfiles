@@ -5,7 +5,7 @@
 #
 # 用法：
 #   wt add <name>   在当前仓库建分支 <name> 的 worktree（分支已存在则复用），重生成 workspace
-#   wt rm  <name>   删除该 worktree（分支保留），重生成 workspace
+#   wt rm  <name>   删除该 worktree（分支和 workspace 文件保留），重生成 workspace
 #   wt ls           列出当前仓库的所有 worktree
 
 : ${WORKTREE_ROOT:="$HOME/worktrees"}
@@ -65,9 +65,13 @@ wt() {
       local name=$1
       [[ -z $name ]] && { print -u2 "用法: wt rm <name>"; return 1; }
       local main; main=$(_wt_main) || { print -u2 "不在 git 仓库内"; return 1; }
-      local dir="$WORKTREE_ROOT/${main:t}/$name"
+      local worktree_dir="$WORKTREE_ROOT/${main:t}"
+      local dir="$worktree_dir/$name"
       git -C "$main" worktree remove "$dir" || return 1
-      _wt_gen_workspace "$main"
+      _wt_gen_workspace "$main" || return 1
+      # 只清理已经为空的 worktree 容器目录。不要清理 WORKTREE_ROOT；同级的
+      # <repo>.code-workspace 即使没有剩余的附加 worktree 也必须保留。
+      rmdir "$worktree_dir" 2>/dev/null || true
       print -- "已删除: $dir（分支 $name 保留，如需删除: git -C \"$main\" branch -d $name）"
       ;;
     ls|list)
