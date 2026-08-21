@@ -142,3 +142,12 @@ export CLAUDE_CODE_NO_FLICKER=1
 
 # Added by Antigravity CLI installer
 export PATH="/Users/kan/.local/bin:$PATH"
+
+# >>> grok installer >>>
+export PATH="$HOME/.grok/bin:$PATH"
+fpath=(~/.grok/completions/zsh $fpath)
+autoload -Uz compinit && compinit -C
+# <<< grok installer <<<
+
+# opencode
+export PATH=/Users/kan/.opencode/bin:$PATH
