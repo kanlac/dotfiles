@@ -2,7 +2,7 @@
 - 使用 [yadm](https://yadm.io) 管理个人配置文件，详见 `~/README.md`
 
 # Tailscale 内网
-- 可通过 Tailscale 用主机名 `kans-mac-mini` SSH 连到 Mac mini（例如 `ssh kans-mac-mini`）
+- `hostname` 确认当前是哪台机器，再判断是否需要通过 Tailscale 主机名 `kans-mac-mini` SSH 过去
 
 # artifacts 目录
 - 说「artifacts 目录」时，指的是 Mac mini 上的 `/Users/Shared/artifacts`，对应公网地址 `https://artifacts.kanlac.store/<文件名>`。复制到该目录即可分享链接
@@ -67,6 +67,26 @@
 - **新建项目 AGENTS.md 时，必须同时建一个 CLAUDE.md 与它互为 symlink**（谁是真身都行，方向不限，但 symlink 必须存在），保证两个 agent 读到同一份项目记忆。
 - **Skill 通过目录级 symlink 共享**：让 `.claude/skills` 与 `.codex/skills` 指向同一目录（保留 `.claude/skills` 为真身，`ln -s ../.claude/skills .codex/skills`），两边看到同一套项目级 skill。
 
+# 派活给外部模型
+
+**Codex**：
+
+```bash
+codex exec --sandbox danger-full-access --model gpt-5.6-sol \
+  -c model_reasoning_effort=xhigh --skip-git-repo-check \
+  -o result.md "$(cat prompt.txt)" < /dev/null
+```
+
+- `< /dev/null` 不能省，否则卡在 `Reading additional input from stdin...` 一动不动。
+- 后台走 Bash 工具的 `run_in_background`，末尾不加 `&`；加了就成了不受追踪的孤儿进程，跑完没有通知。
+- 沙箱禁网：先替它装好依赖，提示词里禁止联网命令、缺包只许报包名。
+- 两个 Codex 不同时写一个仓库；只读/调研类放仓库外跑。
+
+**OpenCode** —— provider 固定 `ark-coding`（火山 Coding Plan），`opencode run -m ark-coding/<model>`，`opencode models ark-coding` 列全部：
+
+- 主力 `glm-5.3`；要长输出（整文件重写、大批量生成）换 `deepseek-v4-pro`，393K 输出上限是唯一扛得住的。
+- 截至 2026-08-19 实测没有 Kimi K3，之后可能上新，以 `opencode models` 为准。
+
 # 全局一致性（品位要求）
 
 - **改了一处，就要保证全局一致**：一旦决定修改某个标准、字段、命名、设计或事实陈述，必须主动扫描整个仓库，把所有受影响、明显不一致的地方一并改成最新标准，不要只改触发点而留下散落的旧表述（例如：把交互组件改成静态后，文档里"可交互/点选"的描述也要同步改）。
@@ -77,6 +97,7 @@
 
 - **不要在文档/代码中硬编码用户名**：Skill 文档、脚本、配置示例中使用 `$HOME`、`~`、`$USER` 等变量或占位符，不要出现具体的用户名（如 `/Users/kan/`）
 - **文档命名规范**：所有文档统一使用 `yyMMdd-` 作为前缀命名（例如 `docs/260603-user-journey.md`），以保持跨项目的时间线清晰可回溯。
+- **CLAUDE.md / AGENTS.md 只写上层引导，不写具体做法**：说明数据在哪、用哪个工具、以及推不出来的关键事实，不要贴命令、SQL 或分步教程。模型有能力自己查出具体怎么做，写细只会让文件腐化。
 
 # 制品文案自检：先坐到用户那把椅子上
 
