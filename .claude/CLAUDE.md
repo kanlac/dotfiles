@@ -43,7 +43,7 @@
 - 别用 `unzip`/`ditto`（按 cp437 瞎解中文名）。用 Python `zipfile`，优先读条目的 `0x7075`（Info-ZIP Unicode Path）取真实 UTF-8 名，无该字段再按 GBK 兜底；跳过 `__MACOSX`、防 zip-slip。截断的 zip 只能 `zip -FF` 抢救已有数据，缺失部分救不回
 
 # Skill 规则
-- **用户说"改 skill" = 改项目源码**，默认指 `~/Documents/agent-steroids`（或其工作树）里的源文件，不是 `~/.codex/plugins/cache/...` 的副本
+- **用户说"改 skill" = 改项目源码**，默认指 `~/Documents/agent-steroids`（或其工作树）里的源文件，不是 `~/.claude/plugins/cache/...` 或 `~/.codex/plugins/cache/...` 的副本
 - **Skill 不能有外部依赖**：不引用 Skill 目录外的路径。需要"参考已有样本"时用搜索指引代替硬编码路径
 - **写方向，不写步骤**：说明意图和方向、给 2-3 个典型示例，而不是 step-by-step 教程。Agent 有判断力
 - **SKILL.md 和 CLAUDE.md 不超过 200 行**，详细流程拆到 `references/` 并被主文档引用
@@ -51,6 +51,7 @@
 # Chrome 浏览器自动化
 - 需要有头 GUI Chrome 时（社交媒体、登录态、反爬、截图、表单），**必须先 invoke `chrome:cdp-chrome` Skill** 并遵循其规则；读社交媒体内容直接用它，别先试 WebFetch/defuddle
 - **禁止自行启动 Chrome 实例**，所有 agent 共用 `~/.config/cdp-chrome/` 那个共享实例
+- **遇到登录页先别下「未登录」结论**：很多站（如 Cloudflare）的登录页其实是账户选择器，点击页面上显示的默认账户往往直接进入——先试这一下，再报告需要用户登录
 
 # 代理配置
 - 通过 `~/.env` 中的 `PROXY=on` 控制代理开关
@@ -81,6 +82,7 @@ codex exec --sandbox danger-full-access --model gpt-5.6-sol \
 - 后台走 Bash 工具的 `run_in_background`，末尾不加 `&`；加了就成了不受追踪的孤儿进程，跑完没有通知。
 - 沙箱禁网：先替它装好依赖，提示词里禁止联网命令、缺包只许报包名。
 - 两个 Codex 不同时写一个仓库；只读/调研类放仓库外跑。
+- **用 Codex 生图**：Codex CLI 内置 GPT Image 2，prompt 里直接说「Generate an image and save to /path/to/file.png」，它会调用内置的 image generation tool 生成图片。**不要让 Codex 写 Python 代码调 OpenAI SDK**（环境里没有 OPENAI_API_KEY，会失败）。Codex 走 ChatGPT Plus OAuth，内置能力不需要额外 key。
 
 **OpenCode** —— provider 固定 `ark-coding`（火山 Coding Plan），`opencode run -m ark-coding/<model>`，`opencode models ark-coding` 列全部：
 
@@ -113,10 +115,6 @@ codex exec --sandbox danger-full-access --model gpt-5.6-sol \
   - 用户给了 URL 或点名了具体项目，**直接 WebFetch 那个 URL**，不要 WebSearch 同名词。
   - 短名有歧义时先确认是哪个仓库（问用户 / 抓 `owner/repo`），别默选最有名的同名项目。
   - 下"它支持/不支持 X"这种结论前，先 fetch 一手 README，不信 WebSearch 摘要。
-
-# NotebookLM 交互
-
-需要和 NotebookLM 交互时，优先使用已配置好的 `notebooklm-py` CLI：进入 `$HOME/Documents/Codex/2026-05-25/teng-lin-notebooklm-py-https-github` 后运行 `uv run notebooklm ...`；上游仓库是 https://github.com/teng-lin/notebooklm-py，可用于排查问题或获取更新；认证已保存在 `~/.notebooklm/profiles/default/storage_state.json`，开始前可用 `uv run notebooklm auth check --test --json` 验证，不要重新索要 Google 账号密码。
 
 # Witness 个人目标系统
 
