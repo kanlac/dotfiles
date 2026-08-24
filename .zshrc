@@ -151,3 +151,9 @@ autoload -Uz compinit && compinit -C
 
 # opencode
 export PATH=/Users/kan/.opencode/bin:$PATH
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/kan/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/kan/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/kan/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/kan/google-cloud-sdk/completion.zsh.inc'; fi
