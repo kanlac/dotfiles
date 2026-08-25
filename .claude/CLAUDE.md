@@ -68,27 +68,6 @@
 - **新建项目 AGENTS.md 时，必须同时建一个 CLAUDE.md 与它互为 symlink**（谁是真身都行，方向不限，但 symlink 必须存在），保证两个 agent 读到同一份项目记忆。
 - **Skill 通过目录级 symlink 共享**：让 `.claude/skills` 与 `.codex/skills` 指向同一目录（保留 `.claude/skills` 为真身，`ln -s ../.claude/skills .codex/skills`），两边看到同一套项目级 skill。
 
-# 派活给外部模型
-
-**Codex**：
-
-```bash
-codex exec --sandbox danger-full-access --model gpt-5.6-sol \
-  -c model_reasoning_effort=xhigh --skip-git-repo-check \
-  -o result.md "$(cat prompt.txt)" < /dev/null
-```
-
-- `< /dev/null` 不能省，否则卡在 `Reading additional input from stdin...` 一动不动。
-- 后台走 Bash 工具的 `run_in_background`，末尾不加 `&`；加了就成了不受追踪的孤儿进程，跑完没有通知。
-- 沙箱禁网：先替它装好依赖，提示词里禁止联网命令、缺包只许报包名。
-- 两个 Codex 不同时写一个仓库；只读/调研类放仓库外跑。
-- **用 Codex 生图**：Codex CLI 内置 GPT Image 2，prompt 里直接说「Generate an image and save to /path/to/file.png」，它会调用内置的 image generation tool 生成图片。**不要让 Codex 写 Python 代码调 OpenAI SDK**（环境里没有 OPENAI_API_KEY，会失败）。Codex 走 ChatGPT Plus OAuth，内置能力不需要额外 key。
-
-**OpenCode** —— provider 固定 `ark-coding`（火山 Coding Plan），`opencode run -m ark-coding/<model>`，`opencode models ark-coding` 列全部：
-
-- 主力 `glm-5.3`；要长输出（整文件重写、大批量生成）换 `deepseek-v4-pro`，393K 输出上限是唯一扛得住的。
-- 截至 2026-08-19 实测没有 Kimi K3，之后可能上新，以 `opencode models` 为准。
-
 # 全局一致性（品位要求）
 
 - **改了一处，就要保证全局一致**：一旦决定修改某个标准、字段、命名、设计或事实陈述，必须主动扫描整个仓库，把所有受影响、明显不一致的地方一并改成最新标准，不要只改触发点而留下散落的旧表述（例如：把交互组件改成静态后，文档里"可交互/点选"的描述也要同步改）。
