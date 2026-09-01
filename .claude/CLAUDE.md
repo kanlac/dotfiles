@@ -14,10 +14,9 @@
 
 | 项目 | 路径 | 用途 |
 |---|---|---|
-| finance | `~/finance` | 个人/家庭财务记录、计划、决策留痕。含金额等敏感数据，勿外传 |
 | agent-steroids | `~/Documents/agent-steroids` | 共享的公开 Claude 插件。Skill 放 `skills/`、Command 放 `commands/`；个人专属 skill 放 `~/.claude/`，不放这里 |
 | Obsidian 库 | `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obsidian/` | 私密文档 + 写作库，详见下方专节 |
-| witness | `~/witness` | 个人目标系统，数据和代码同仓，详见下方专节 |
+| witness | `~/witness` | 个人目标系统，数据和代码同仓。财务决策（D-009~D-014）和参考文档（`docs/`）已并入，详见下方专节 |
 
 # 飞书 / Lark CLI
 - 处理飞书 / Lark / Feishu 相关任务时，优先使用 `lark-cli`；执行具体操作前，先用 `lark-cli skills list` 判断领域，再用 `lark-cli skills read <skill-name>` 读取官方 skill 文档，不要凭记忆直接调用命令。常见入口：认证/权限读 `lark-shared`，文档读写读 `lark-doc`，云盘文件读 `lark-drive`，消息读 `lark-im`，日历读 `lark-calendar`；官方仓库：https://github.com/larksuite/cli
