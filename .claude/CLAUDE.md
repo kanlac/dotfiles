@@ -48,9 +48,10 @@
 - **写方向，不写步骤**：说明意图和方向、给 2-3 个典型示例，而不是 step-by-step 教程。Agent 有判断力
 - **SKILL.md 和 CLAUDE.md 不超过 200 行**，详细流程拆到 `references/` 并被主文档引用
 
-# Chrome 浏览器自动化
-- 需要有头 GUI Chrome 时（社交媒体、登录态、反爬、截图、表单），**必须先 invoke `chrome:cdp-chrome` Skill** 并遵循其规则；读社交媒体内容直接用它，别先试 WebFetch/defuddle
-- **禁止自行启动 Chrome 实例**，所有 agent 共用 `~/.config/cdp-chrome/` 那个共享实例
+# 浏览器自动化（分两档）
+- **不需要登录态/GUI 的浏览任务**（截图、取 DOM/文本、审查本地构建产物、无登录交互）用 `agent-browser` CLI：按需启动、headless、无 MCP，加 `--session <唯一名>` 与其它 agent 隔离；用前先 `agent-browser skills get core` 看用法
+- **需要登录态、反爬指纹或用户旁观 GUI 时**（社交媒体、登录站点、反爬页面），**必须先 invoke `chrome:cdp-chrome` Skill** 并遵循其规则；读社交媒体内容直接用它，别先试 WebFetch/defuddle
+- cdp-chrome 的共享实例全局唯一（`~/.config/cdp-chrome/`），**禁止自行启动有头 Chrome**；轻量档工具缺失时先补装或报告，不许因此把任务升级到 cdp-chrome
 - **遇到登录页先别下「未登录」结论**：很多站（如 Cloudflare）的登录页其实是账户选择器，点击页面上显示的默认账户往往直接进入——先试这一下，再报告需要用户登录
 
 # 代理配置
