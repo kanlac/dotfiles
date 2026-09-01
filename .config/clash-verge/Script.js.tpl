@@ -365,18 +365,22 @@ function main(config) {
     (config["proxy-groups"] || []).map(group => [group.name, group])
   );
   const existingProviders = config["proxy-providers"] || {};
+  // Compare the member list exactly. A containment check would treat a stale
+  // wider group (say yfho+legal) as already satisfying a narrower target
+  // (legal only) and return early, silently keeping a retired provider after
+  // it is dropped from the inventory.
+  const usesExactly = (group, wanted) =>
+    Array.isArray(group?.use) &&
+    group.use.length === wanted.length &&
+    wanted.every((provider, index) =>
+      group.use[index] === provider && existingProviders[provider]
+    );
   if (
-    Object.values(SERVICE_EGRESS_POLICIES).every(policy => {
-      const group = existingGroups.get(policy.group);
-      return group && policy.use.every(provider =>
-        group.use?.includes(provider) && existingProviders[provider]
-      );
-    }) &&
+    Object.values(SERVICE_EGRESS_POLICIES).every(policy =>
+      usesExactly(existingGroups.get(policy.group), policy.use)
+    ) &&
     existingGroups.get(SPOTIFY_POLICY_GROUP)?.proxies?.includes("DIRECT") &&
-    SPOTIFY_PROVIDER_IDS.every(provider =>
-      existingGroups.get(SPOTIFY_POLICY_GROUP)?.use?.includes(provider) &&
-      existingProviders[provider]
-    )
+    usesExactly(existingGroups.get(SPOTIFY_POLICY_GROUP), SPOTIFY_PROVIDER_IDS)
   ) {
     return config;
   }
