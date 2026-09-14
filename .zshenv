@@ -4,6 +4,10 @@ if [ -f "$HOME/.env" ]; then
     source "$HOME/.env"
 fi
 
+# opencode 默认把单步输出限在 32000（推理也算），这里放开全局上限，
+# 每个模型的实际上限由 ~/.config/opencode/opencode.json 里的 limit.output 决定
+export OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX=1000000
+
 # ---- Proxy toggle via env: PROXY=on ----
 if [[ "${PROXY:l}" == "on" ]]; then
   local http="http://127.0.0.1:7890"
