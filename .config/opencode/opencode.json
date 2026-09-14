@@ -1,31 +1,34 @@
 {
   "permission": "allow",
   "plugin": [
-    "opencode-antigravity-auth@1.6.0",
+    "opencode-antigravity-auth@beta",
     "opencode-openai-codex-auth"
   ],
   "model": "google/antigravity-gemini-3-pro-high",
   "mcp": {
-    "context7": {
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
-      },
-      "enabled": true
-    },
     "playwright": {
       "type": "local",
       "command": [
         "npx",
         "@playwright/mcp@latest"
-      ]
+      ],
+      "enabled": true
     },
     "chrome-devtools": {
       "type": "local",
       "command": [
         "npx",
         "chrome-devtools-mcp@latest"
+      ]
+    },
+    "playwright-localhost3000-kan": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--storage-state=/Users/kan/.config/playwrightAuth/localhost3000-kan.json",
+        "--save-session"
       ]
     }
   },
@@ -415,6 +418,13 @@
           "name": "Kimi-K2.7-Code",
           "limit": {
             "context": 262144,
+            "output": 32768
+          }
+        },
+        "kimi-k3": {
+          "name": "Kimi-K3",
+          "limit": {
+            "context": 1048576,
             "output": 32768
           }
         },
