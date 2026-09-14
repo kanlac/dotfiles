@@ -398,6 +398,20 @@
           "limit": {
             "context": 1048576,
             "output": 128000
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         },
         "glm-5.2": {
@@ -405,6 +419,20 @@
           "limit": {
             "context": 1048576,
             "output": 131072
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         },
         "deepseek-v4-pro": {
@@ -412,6 +440,20 @@
           "limit": {
             "context": 1048576,
             "output": 393216
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         },
         "kimi-k2.7-code": {
@@ -419,6 +461,20 @@
           "limit": {
             "context": 262144,
             "output": 32768
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         },
         "kimi-k3": {
@@ -426,6 +482,20 @@
           "limit": {
             "context": 1048576,
             "output": 32768
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         },
         "minimax-m3": {
@@ -433,6 +503,20 @@
           "limit": {
             "context": 204800,
             "output": 32000
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         },
         "doubao-seed-2.0-code": {
@@ -440,6 +524,20 @@
           "limit": {
             "context": 262144,
             "output": 64000
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         },
         "ark-code-latest": {
@@ -447,6 +545,20 @@
           "limit": {
             "context": 262144,
             "output": 64000
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         }
       }
