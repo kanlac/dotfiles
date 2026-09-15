@@ -111,6 +111,7 @@ const CAPTIVE_PORTAL_RULES = [
   "DOMAIN-SUFFIX,detectportal.firefox.com,DIRECT",
   "PROCESS-NAME,Captive Network Assistant,DIRECT",
   "PROCESS-NAME,CaptiveNetworkAssistant,DIRECT",
+  "PROCESS-NAME,captiveagent,DIRECT",
 ];
 
 const AIRPORT_CONTROL_RULES = [
