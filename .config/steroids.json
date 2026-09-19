@@ -1,0 +1,10 @@
+{
+  "cdp-chrome": {
+    "port": 9224
+  },
+  "dispatch": {
+    "opencode": {
+      "provider": "ark-coding"
+    }
+  }
+}
