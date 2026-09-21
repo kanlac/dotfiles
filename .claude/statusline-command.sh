@@ -15,7 +15,7 @@ RESET='\033[0m'; BOLD='\033[1m'; DIM='\033[2m'
 c() { printf '\033[38;5;%sm' "$1"; }   # 256-color foreground
 
 FILL='█'; EMPTY='░'          # context / rate-limit gauges
-PIP='▰';  PIP_OFF='▱'        # effort ladder
+PIP='▮'; PIP_OFF='▯'        # effort ladder（Ghostty 里 U+25AE-25AF 固定用 Menlo）
 
 # ---- palettes ----------------------------------------------------------------
 theme=${CC_STATUSLINE_THEME:-$DEFAULT_THEME}
@@ -152,7 +152,6 @@ esac
 if [ "$en" -gt 0 ]; then
   pips=""; i=1
   while [ "$i" -le "$etotal" ]; do
-    [ "$i" -gt 1 ] && pips="${pips} "
     if [ "$i" -le "$en" ]; then pips="${pips}${ec}${PIP}"; else pips="${pips}${C_EMPTY}${PIP_OFF}"; fi
     i=$(( i + 1 ))
   done

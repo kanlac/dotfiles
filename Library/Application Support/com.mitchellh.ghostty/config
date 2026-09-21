@@ -19,6 +19,8 @@ unfocused-split-opacity = 0.90
 # Font
 font-family = ""
 font-family = "Monaco"
+# 状态栏 effort 档位 ▮▯：Monaco 缺这两个符号，固定用 Menlo，避免回退忽大忽小
+font-codepoint-map = U+25AE-U+25AF=Menlo
 font-size = 18
 window-inherit-font-size = false
 
