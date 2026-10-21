@@ -71,6 +71,24 @@ eval "$(echo "$input" | jq -r '
   @sh "week_at=\(.rate_limits.seven_day.resets_at // "" | tostring)"
 ')"
 
+# ---- 用量快照落盘：让 agent 随时能 cat 到最新的 5h / 7d 百分比 ----------------
+# 只在拿到 rate_limits 时覆盖写（会话刚开、窗口过期时保留旧值）；先写临时文件再 mv，
+# 读的一方不会读到写一半的内容；任何失败都静默，不影响状态栏显示。
+USAGE_FILE=${CC_USAGE_FILE:-$HOME/.claude/usage.json}
+if [ -n "$five_pct$week_pct" ]; then
+  _tmp="${USAGE_FILE}.$$"
+  echo "$input" | jq '
+    def hr: if . == null then null else (floor | strflocaltime("%Y-%m-%d %H:%M:%S %z")) end;
+    def win: if . == null then null else . + {resets_at_local: (.resets_at | hr)} end;
+    {
+      updated_at: (now | floor),
+      updated_at_local: (now | hr),
+      session_id: (.session_id // null),
+      five_hour:  (.rate_limits.five_hour | win),
+      seven_day:  (.rate_limits.seven_day | win)
+    }' > "$_tmp" 2>/dev/null && mv -f "$_tmp" "$USAGE_FILE" 2>/dev/null || rm -f "$_tmp" 2>/dev/null
+fi
+
 git_branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
 
 # "Opus 5 (1M context)" -> "Opus 5" + ·1M badge
