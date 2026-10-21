@@ -1,7 +1,8 @@
 # Git worktree 管理
 # 规范：所有 worktree 统一放在 $WORKTREE_ROOT/<repo>/<name>（默认 ~/worktrees），
 # 并为每个有 worktree 的仓库维护 $WORKTREE_ROOT/<repo>.code-workspace（VS Code 多根
-# workspace，方便 Remote-SSH 打开）。workspace 文件由 git worktree list 自动生成，勿手改。
+# workspace，方便 Remote-SSH 打开）。folders 由 git worktree list 自动生成，勿手改；
+# settings 段会在重生成时原样保留（如 foam.files.ignore 等工作区级设置写在这里）。
 #
 # 用法：
 #   wt add <name>   在当前仓库建分支 <name> 的 worktree（分支已存在则复用），重生成 workspace
@@ -25,6 +26,10 @@ _wt_gen_workspace() {
   local -a paths
   local line
   mkdir -p "$WORKTREE_ROOT"
+  # 保留已有 workspace 的 settings，避免重生成时把手工配置清空
+  local settings='{}'
+  [[ -f $ws ]] && settings=$(jq -c '.settings // {}' "$ws" 2>/dev/null) || true
+  [[ -z $settings ]] && settings='{}'
   while IFS= read -r line; do
     paths+=("${line#worktree }")
   done < <(git -C "$main" worktree list --porcelain | grep '^worktree ')
@@ -38,7 +43,7 @@ _wt_gen_workspace() {
       print -- "    { \"path\": \"${paths[$i]}\" }$comma"
     done
     print -- '  ],'
-    print -- '  "settings": {}'
+    print -- "  \"settings\": $settings"
     print -- '}'
   } > "$ws"
   print -- "workspace: $ws"

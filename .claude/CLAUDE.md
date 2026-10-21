@@ -65,7 +65,7 @@
 
 让项目记忆和 skill 在 Claude Code 与 Codex CLI 之间共用，避免两份漂移：
 
-- **新建项目 AGENTS.md 时，必须同时建一个 CLAUDE.md 与它互为 symlink**（谁是真身都行，方向不限，但 symlink 必须存在），保证两个 agent 读到同一份项目记忆。
+- **项目记忆只写 `AGENTS.md`**：Claude Code 与 Codex CLI 都直接读它，不再建 `CLAUDE.md`。
 - **Skill 通过目录级 symlink 共享**：让 `.claude/skills` 与 `.codex/skills` 指向同一目录（保留 `.claude/skills` 为真身，`ln -s ../.claude/skills .codex/skills`），两边看到同一套项目级 skill。
 
 # 全局一致性（品位要求）
