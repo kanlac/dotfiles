@@ -7,7 +7,10 @@
 # 用法：
 #   wt add <name>   在当前仓库建分支 <name> 的 worktree（分支已存在则复用），重生成 workspace
 #   wt rm  <name>   删除该 worktree（分支和 workspace 文件保留），重生成 workspace
-#   wt ls           列出当前仓库的所有 worktree
+#   wt ls           列出当前仓库的所有 worktree，并重生成 workspace
+#
+# 各仓库 .git/hooks/post-checkout 在任何 git worktree add 之后调用 _wt_gen_workspace，
+# 所以不经 wt 建的 worktree 也会进 workspace。
 
 : ${WORKTREE_ROOT:="$HOME/worktrees"}
 
@@ -82,6 +85,8 @@ wt() {
     ls|list)
       local main; main=$(_wt_main) || { print -u2 "不在 git 仓库内"; return 1; }
       git -C "$main" worktree list
+      # 用 git worktree remove 等绕过 wt rm 删掉的，在这里从 workspace 里清掉
+      _wt_gen_workspace "$main" >/dev/null
       ;;
     *)
       print -- "用法: wt add <name> | wt rm <name> | wt ls"

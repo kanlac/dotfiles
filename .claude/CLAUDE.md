@@ -32,7 +32,7 @@
 # Git Worktree 规范
 - 所有 worktree 统一放在 `$WORKTREE_ROOT/<repo>/<name>`（`WORKTREE_ROOT` 默认 `~/worktrees`），按仓库分组，不再放仓库同级目录。
 - 每个有 worktree 的仓库在 `$WORKTREE_ROOT/<repo>.code-workspace` 维护一个 VS Code 多根 workspace 文件（放 worktrees 目录、不进仓库），方便 Remote-SSH 到 `kans-mac-mini` 后直接打开。该文件由 `git worktree list` 自动生成，不手改。
-- 用 `wt` 函数管理（定义在 `~/.config/zsh-custom/worktree.zsh`，oh-my-zsh 自动加载）：`wt add <name>` 创建、`wt rm <name>` 删除、`wt ls` 列出；主仓库或任一 worktree 内都能运行，创建/删除会自动重生成 workspace 文件。
+- 用 `wt` 函数管理（定义在 `~/.config/zsh-custom/worktree.zsh`，oh-my-zsh 自动加载）：`wt add <name>` 创建、`wt rm <name>` 删除、`wt ls` 列出；主仓库或任一 worktree 内都能运行，创建、删除和 `wt ls` 都会重生成 workspace 文件。有 worktree 的仓库在 `.git/hooks/post-checkout` 装了兜底钩子：不经 `wt` 的 `git worktree add` 也会重生成；不经 `wt` 删的，下次 `wt ls` 清掉。新仓库第一次建 worktree 时把同一个钩子复制过去。
 - Claude Code 的 `isolation: "worktree"` 默认放在 `.claude/worktrees/`，与本规范不符；如需手动创建 worktree，用 `wt` 函数或按上述规范执行。
 
 # GitHub 评论发布规则
@@ -123,3 +123,6 @@
 - **LLM-Wiki (Andrej Karpathy 提出)**: 
   - 概念来源: [Karpathy LLM Wiki Gist](https://gist.github.com/karpathy/d4e414c12bb166cdab0eb2160cf1c0d4) (及相关社区实践)
   - 核心思想: 放弃传统的“每次重新检索阅读生文”的 RAG 模式，转向“持续累积和编译”模式。系统维护一个结构化、互相链接的 Markdown Wiki。用户上传资料（Ingest），AI 提取事实更新 Wiki；用户提问（Query），AI 基于 Wiki 回答并更新新知识；AI 后台自动整理（Lint）。这非常适合做多品牌代运营的知识沉淀，是目前基础形态的产品方向。
+
+# Mac mini 屏保不是锁屏
+- `kans-mac-mini` 不会真正锁屏：显示时钟壁纸、`CGSSessionScreenIsLocked=true` 只是屏保，不需要用户解锁。按一下 Shift（System Events `key code 56`，经有辅助功能权限的终端执行）即回到桌面，截屏确认后再操作 GUI；只有截屏出现密码框才停下报告
