@@ -1,0 +1,8 @@
+#!/bin/zsh
+# 任何工具执行 git worktree add 后（旧 HEAD 为全零），按 git worktree list
+# 重生成 $WORKTREE_ROOT/<repo>.code-workspace。生成逻辑在 wt 函数里，这里只调用。
+[[ $1 =~ '^0+$' ]] || exit 0
+source ~/.config/zsh-custom/worktree.zsh 2>/dev/null || exit 0
+main=$(_wt_main) || exit 0
+_wt_gen_workspace "$main" >/dev/null 2>&1
+exit 0

@@ -32,7 +32,7 @@
 # Git Worktree 规范
 - 所有 worktree 统一放在 `$WORKTREE_ROOT/<repo>/<name>`（`WORKTREE_ROOT` 默认 `~/worktrees`），按仓库分组，不再放仓库同级目录。
 - 每个有 worktree 的仓库在 `$WORKTREE_ROOT/<repo>.code-workspace` 维护一个 VS Code 多根 workspace 文件（放 worktrees 目录、不进仓库），方便 Remote-SSH 到 `kans-mac-mini` 后直接打开。该文件由 `git worktree list` 自动生成，不手改。
-- 用 `wt` 函数管理（定义在 `~/.config/zsh-custom/worktree.zsh`，oh-my-zsh 自动加载）：`wt add <name>` 创建、`wt rm <name>` 删除、`wt ls` 列出；主仓库或任一 worktree 内都能运行，创建、删除和 `wt ls` 都会重生成 workspace 文件。有 worktree 的仓库在 `.git/hooks/post-checkout` 装了兜底钩子：不经 `wt` 的 `git worktree add` 也会重生成；不经 `wt` 删的，下次 `wt ls` 清掉。新仓库第一次建 worktree 时把同一个钩子复制过去。
+- 用 `wt` 函数管理（定义在 `~/.config/zsh-custom/worktree.zsh`，oh-my-zsh 自动加载）：`wt add <name>` 创建、`wt rm <name>` 删除、`wt ls` 列出；主仓库或任一 worktree 内都能运行，创建、删除和 `wt ls` 都会重生成 workspace 文件。有 worktree 的仓库在 `.git/hooks/post-checkout` 装了兜底钩子：不经 `wt` 的 `git worktree add` 也会重生成；不经 `wt` 删的，下次 `wt ls` 清掉。新仓库第一次建 worktree 时把 `~/.config/zsh-custom/git-hooks/post-checkout` 复制过去。
 - Claude Code 的 `isolation: "worktree"` 默认放在 `.claude/worktrees/`，与本规范不符；如需手动创建 worktree，用 `wt` 函数或按上述规范执行。
 
 # GitHub 评论发布规则
