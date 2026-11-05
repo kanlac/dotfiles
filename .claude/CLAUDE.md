@@ -4,17 +4,12 @@
 # Tailscale 内网
 - `hostname` 确认当前是哪台机器，再判断是否需要通过 Tailscale 主机名 `kans-mac-mini` SSH 过去
 
-# artifacts 目录
-- 说「artifacts 目录」时，指的是 Mac mini 上的 `/Users/Shared/artifacts`，对应公网地址 `https://artifacts.kanlac.store/<文件名>`。复制到该目录即可分享链接
-- **这个目录公网无鉴权，任何人拿到 URL 都能访问**，文件名就是唯一的门槛。按内容敏感度选名字：
-  - **含真实人名、报价底线、谈判条款、他人隐私的** —— 必须用不可猜的随机串，且不要把链接贴到任何公开场合
-  - **本来就要发给别人看的成品**（服务说明、分享稿、给客户的页面）—— 可以用有含义的短名字，方便直接发链接
-
 # 项目索引
 
 | 项目 | 路径 | 用途 |
 |---|---|---|
 | agent-steroids | `~/Documents/agent-steroids` | 共享的公开 Claude 插件。Skill 放 `skills/`、Command 放 `commands/`；个人专属 skill 放 `~/.claude/`，不放这里 |
+| pages | `~/pages`（GitHub `kanlac/pages`） | 说「用 pages 做页面」就是指它：页面放进去推到 main 即得公开链接，做法和命名见其 `README.md` |
 | Obsidian 库 | `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/obsidian/` | 私密文档 + 写作库，详见下方专节 |
 | witness | `~/witness` | 个人目标系统，数据和代码同仓。财务决策（D-009~D-014）和参考文档（`docs/`）已并入，详见下方专节 |
 
@@ -124,5 +119,5 @@
   - 概念来源: [Karpathy LLM Wiki Gist](https://gist.github.com/karpathy/d4e414c12bb166cdab0eb2160cf1c0d4) (及相关社区实践)
   - 核心思想: 放弃传统的“每次重新检索阅读生文”的 RAG 模式，转向“持续累积和编译”模式。系统维护一个结构化、互相链接的 Markdown Wiki。用户上传资料（Ingest），AI 提取事实更新 Wiki；用户提问（Query），AI 基于 Wiki 回答并更新新知识；AI 后台自动整理（Lint）。这非常适合做多品牌代运营的知识沉淀，是目前基础形态的产品方向。
 
-# Mac mini 屏保不是锁屏
-- `kans-mac-mini` 不会真正锁屏：显示时钟壁纸、`CGSSessionScreenIsLocked=true` 只是屏保，不需要用户解锁。按一下 Shift（System Events `key code 56`，经有辅助功能权限的终端执行）即回到桌面，截屏确认后再操作 GUI；只有截屏出现密码框才停下报告
+# Mac mini 共用资源
+- 在 `kans-mac-mini` 上跑重活、操作图形界面、删临时文件或磁盘紧张时，用 `mac-mini` 技能（`~/.claude/skills/mac-mini/`）：重活排队、界面代跑与锁、屏保不是锁屏、磁盘底线、删除边界都在那里
