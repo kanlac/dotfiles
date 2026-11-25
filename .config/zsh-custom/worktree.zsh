@@ -64,7 +64,12 @@ wt() {
       if git -C "$main" show-ref --verify --quiet "refs/heads/$name"; then
         git -C "$main" worktree add "$dir" "$name" || return 1
       else
-        git -C "$main" worktree add "$dir" -b "$name" || return 1
+        # 新分支从远端默认分支拉（先 fetch），不从可能落后的本地分支拉；没有 origin 时用当前 HEAD
+        local base=HEAD
+        if git -C "$main" remote get-url origin >/dev/null 2>&1 && git -C "$main" fetch -q origin; then
+          base=$(git -C "$main" symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || print origin/main)
+        fi
+        git -C "$main" worktree add "$dir" -b "$name" "$base" || return 1
       fi
       _wt_gen_workspace "$main"
       print -- "已创建: $dir"

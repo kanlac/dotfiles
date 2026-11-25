@@ -5,7 +5,8 @@
   "enabled_providers": [
     "openrouter",
     "anthropic",
-    "nvidia"
+    "nvidia",
+    "openai"
   ],
   "provider": {
     "nvidia": {

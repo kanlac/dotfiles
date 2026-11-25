@@ -143,11 +143,6 @@ export CLAUDE_CODE_NO_FLICKER=1
 # Added by Antigravity CLI installer
 export PATH="/Users/kan/.local/bin:$PATH"
 
-# >>> grok installer >>>
-export PATH="$HOME/.grok/bin:$PATH"
-fpath=(~/.grok/completions/zsh $fpath)
-autoload -Uz compinit && compinit -C
-# <<< grok installer <<<
 
 # opencode
 export PATH=/Users/kan/.opencode/bin:$PATH
@@ -157,3 +152,9 @@ if [ -f '/Users/kan/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/kan/google-
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/kan/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/kan/google-cloud-sdk/completion.zsh.inc'; fi
+
+# >>> grok installer >>>
+export PATH="$HOME/.grok/bin:$PATH"
+fpath=(~/.grok/completions/zsh $fpath)
+autoload -Uz compinit && compinit -C
+# <<< grok installer <<<
